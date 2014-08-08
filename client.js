@@ -17,7 +17,7 @@ FileUpload = function (file, scheme, metaData) {
     var started = false,
         done = function () {},
         formData = null,
-        xhr = window.getXMLHTTPObject(),
+        xhr = new XMLHttpRequest(),
         progress = 0,
         dep = new Deps.Dependency();
 
@@ -29,52 +29,58 @@ FileUpload = function (file, scheme, metaData) {
         }
     }, false);
 
+    function buildFormData(target) {
+        var formData = new FormData();
 
-    Meteor.call("edgee-file-upload-start", {
-        scheme: scheme,
-        file: _.pick(file, "name", "size", "type"),
-        meta: metaData
-    }, function (error, response) {
-        if (error)
-            throw error;
+        //Amazon requires fields to be given in a particular order
+        formData.append("key", target.key);
 
-        formData = new FormData();
-        formData.append("file", file);
-
-        _.each(response.target, function (value, key) {
+        _.chain(target).omit("key").each(function (value, key) {
             formData.append(key, value);
         });
 
-        xhr.addEventListener("load", function (event) {
-            Meteor.call("edgee-file-upload-end", response._id,
-                event.target.responseText, function (error) {
-                    if (error)
-                        done(error);
+        formData.append("file", file);
 
-                    dep.changed();
-                    progress = 1;
+        return formData;
+    }
 
-                    done(null, response.target.key);
-                });
+
+    function makeRequest() {
+        Meteor.call("edgee-file-upload", {
+            scheme: scheme,
+            file: _.pick(file, "name", "size", "type"),
+            meta: metaData
+        }, function (error, response) {
+            if (error)
+                throw error;
+
+            formData = buildFormData(response.target);
+
+            xhr.addEventListener("load", function () {
+                dep.changed();
+                progress = 1;
+
+                done(null, response.postUrl + response.target.key);
+            });
+
+            xhr.addEventListener("error", function (event) {
+                dep.changed();
+                progress = 0;
+
+                done(new Error("Upload failed:" + event));
+            });
+
+            xhr.addEventListener("abort", function () {
+                done(new Error("The upload has been cancelled"));
+            });
+
+            xhr.open("POST", response.postUrl, true);
+
+            if (started) {
+                upload();
+            }
         });
-
-        xhr.addEventListener("error", function (event) {
-            dep.changed();
-            progress = 0;
-
-            done(new Error("Upload failed:" + event));
-        });
-
-        xhr.addEventListener("abort", function () {
-            done(new Error("The upload has been cancelled"));
-        });
-
-        xhr.open("POST", response.postUrl, true);
-
-        if (started) {
-            upload();
-        }
-    });
+    }
 
 
     function upload() {
@@ -100,8 +106,14 @@ FileUpload = function (file, scheme, metaData) {
 
             done = callback;
 
-            if (formData)
-                upload();
+            try {
+                if (formData)
+                    upload();
+                else
+                    makeRequest();
+            } catch (error) {
+                callback(error);
+            }
         },
 
         /** Reactive function that returns the current progress value.
