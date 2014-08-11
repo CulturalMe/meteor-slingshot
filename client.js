@@ -13,7 +13,7 @@
  * @constructor
  */
 
-FileUpload = function (file, scheme, metaData) {
+FileUpload = function (scheme, metaData) {
     var started = false,
         done = function () {},
         formData = null,
@@ -29,7 +29,7 @@ FileUpload = function (file, scheme, metaData) {
         }
     }, false);
 
-    function buildFormData(target) {
+    function buildFormData(file, target) {
         var formData = new FormData();
 
         //Amazon requires fields to be given in a particular order
@@ -45,7 +45,7 @@ FileUpload = function (file, scheme, metaData) {
     }
 
 
-    function makeRequest() {
+    function makeRequest(file) {
         Meteor.call("edgee-file-upload", {
             scheme: scheme,
             file: _.pick(file, "name", "size", "type"),
@@ -54,7 +54,7 @@ FileUpload = function (file, scheme, metaData) {
             if (error)
                 throw error;
 
-            formData = buildFormData(response.target);
+            formData = buildFormData(file, response.target);
 
             xhr.addEventListener("load", function () {
                 dep.changed();
@@ -94,23 +94,25 @@ FileUpload = function (file, scheme, metaData) {
 
         /** Start uploading the file.
          *
-         * @param callback {Function} Gets called when the file was uploaded or
-         * on error.
+         * @param file {File}
+         * @param [callback] {Function} Gets called when the file was uploaded
+         * or on error.
          */
 
-        start: function (callback) {
+        upload: function (file, callback) {
             if (started)
                 throw new Error("Upload has already started");
 
             started = true;
 
-            done = callback;
+            if (callback)
+                done = callback;
 
             try {
                 if (formData)
                     upload();
                 else
-                    makeRequest();
+                    makeRequest(file);
             } catch (error) {
                 callback(error);
             }
