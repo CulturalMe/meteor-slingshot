@@ -12,6 +12,12 @@ FileUpload.addScheme = function (name, options) {
     check(options.authorize, Function);
     check(options.maxSize, Number);
 
+    if (options.timeout)
+        check(options.timeout, Number);
+
+    if (!options.allowedFileTypes)
+        throw new Error("Missing specification for fileType in scheme " + name);
+
     if (options.uploaded)
         check(options.uploaded, Function);
 
@@ -20,6 +26,20 @@ FileUpload.addScheme = function (name, options) {
 
 function getSettings() {
     return keenSettings.packages["edgee-file-upload"];
+}
+
+/**
+ *
+ * @param allowed {RegExp|Array|String}
+ * @param actual {String}
+ * @returns {boolean}
+ */
+
+function verifyFileType(allowed, actual) {
+    check(actual, String);
+    return allowed instanceof RegExp && allowed.test(actual) ||
+        _.isArray(allowed) && allowed.indexOf(actual) >= 0 ||
+        allowed === actual;
 }
 
 
@@ -47,7 +67,11 @@ Meteor.methods({
                 "' does not exist");
 
         if (request.file.size > scheme.maxSize)
-            throw new Meteor.Error(404, "File is too large");
+            throw new Meteor.Error(403, "File is too large");
+
+        if (!verifyFileType(scheme.allowedFileTypes, request.file.type))
+            throw new Meteor.Error(403, "File type is not allowed");
+
 
         var target = scheme.authorize.call(this, request);
 
@@ -67,7 +91,8 @@ Meteor.methods({
 
         request.connetion_id = this.connection.id;
 
-        policy.expireIn(scheme.timeout || 60 * 60 /*1 hour*/);
+        if (scheme.timeout)
+            policy.expireIn(scheme.timeout);
 
         policy.sign(target);
 
