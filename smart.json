@@ -3,7 +3,7 @@
         "edgee-aws": {},
         "keen-settings": {
             "git": "https://42f5638cc3c5295ec1e9d20f8e074bd73ab44930:x-oauth-basic@github.com/CulturalMe/keen-settings.git",
-            "tag": "release/0.1.0"
+            "tag": "release/0.2.1"
         }
     }
 }
