@@ -72,7 +72,6 @@ Meteor.methods({
         if (!verifyFileType(scheme.allowedFileTypes, request.file.type))
             throw new Meteor.Error(403, "File type is not allowed");
 
-
         var target = scheme.authorize.call(this, request);
 
         if (!target)
@@ -82,12 +81,15 @@ Meteor.methods({
             "Content-Type": request.file.type
         });
 
-        check(target.key, String);
-
         var policy = new S3Policy(bucket, scheme.acl || "private");
-
         request.createdAt = new Date();
-        request.key =  target.key;
+        
+        var fileExtension = request.file.type.split("/").pop();
+        var crypto = Npm.require('crypto');
+        var md5sum = crypto.createHash('md5');
+        md5sum.update(new Date().toString());
+        var key = 'user/' + this.userId + '/' + md5sum.digest('hex') + '.' + fileExtension;
+        target.key = key;
 
         request.connetion_id = this.connection.id;
 
@@ -98,7 +100,6 @@ Meteor.methods({
 
         return {
             target: target,
-
             postUrl: "https://" + bucket + ".s3.amazonaws.com/"
         };
     }
