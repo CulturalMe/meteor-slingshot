@@ -153,7 +153,9 @@ authorization will expire after the request was made.
 `acl` String (optional)
 
 `AWSAccessKeyId` String (required for AWS S3)
+
 `AWSSecretAccessKey` String (required for AWS S3)
 
 `GoogleAccessId` String (required for Google Cloud Storage)
+
 `GoogleSecretKey` String (required for Google Cloud Storage)
