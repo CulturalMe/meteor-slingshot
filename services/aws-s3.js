@@ -2,6 +2,7 @@ Slingshot.S3Storage = {
 
   directiveMatch: {
     bucket: String,
+    domain: Match.Optional(String),
 
     AWSAccessKeyId: String,
     AWSSecretAccessKey: String,
@@ -65,11 +66,11 @@ Slingshot.S3Storage = {
           "acl": directive.acl,
 
           "Cache-Control": directive.cacheControl,
-          "Content-Disposition": directive.contentDisposition,
+          "Content-Disposition": directive.contentDisposition
         },
-        domain = this.domain ? url.parse(this.domain) : url.format({
+        domain = url.format({
             protocol: "https",
-            host: directive.bucket + ".s3.amazonaws.com"
+            host: directive.domain || directive.bucket + ".s3.amazonaws.com"
         });
 
     domain.pathname = payload.key;

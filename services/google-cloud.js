@@ -2,6 +2,7 @@ Slingshot.GoogleCloud = {
 
   directiveMatch: {
     bucket: String,
+    domain: Match.Optional(String),
 
     GoogleAccessId: String,
     GoogleSecretKey: String,
@@ -63,9 +64,9 @@ Slingshot.GoogleCloud = {
           "Cache-Control": directive.cacheControl,
           "Content-Disposition": directive.contentDisposition
         },
-        domain = this.domain ? url.parse(this.domain) : url.format({
+        domain = url.format({
           protocol: "https",
-          host: directive.bucket + ".storage.googleapis.com"
+          host: directive.domain || directive.bucket + ".storage.googleapis.com"
         });
 
     domain.pathname = payload.key;

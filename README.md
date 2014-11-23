@@ -140,6 +140,9 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 `bucket` String (required) - Name of bucket to use.
 
+`domain` String (optional) - Override domain to use to access bucket. Useful for
+CDN.
+
 `key` String or Function (required) - Name of the file on the cloud storage
 service. If a function is provided, it will be called with `userId` in the
 context and its return value is used as the key.
