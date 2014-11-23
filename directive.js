@@ -8,7 +8,8 @@ Slingshot = {};
 /**
  * @callback Directive~authorize
  *
- * The Directive is passed on as the context of the authorize function.
+ * The meteor method context is passed on to this function, including
+ * this.userId
  *
  * @throws Meteor.Error
  *
@@ -23,11 +24,20 @@ Slingshot = {};
  * @typedef {Object} Directive
  *
  * @property {Number} maxSize - Maximum size in bytes
- * @property {(string, string[], RegExp, null)} allowedFileTypes - MIME types
- * that can be uploaded. If null is passed, all file types will be allowed.
+ * @property {(string, Array.<String>, RegExp, null)} allowedFileTypes - MIME
+ * types that can be uploaded. If null is passed, then all file types are
+ * allowed.
  *
  * @property {Directive~authorize} authorize - Function to determine whether a
  * file-upload is authorized or not.
+ *
+ * @property {String} [cacheControl] - rfc2616 Cache-Control directive (if
+ * applicable to the selected storage service)
+ *
+ * @property {String} [contentDisposition] - rfc2616 Content-Disposition
+ * directive. Defaults to "inline; <uploaded file name>"
+ *
+ * @property {String}
  */
 
 /**
@@ -36,8 +46,7 @@ Slingshot = {};
  * @property {String} name
  * @property {Number} size - File-size in bytes.
  * @property {String} type - mime type.
- * @property {Array.<String>} order - Order of keys in which form data should
- * appear
+ *
  */
 
 /**
@@ -45,9 +54,8 @@ Slingshot = {};
  *
  * @property {String} upload - POST URL
  * @property {String} download - Download URL
- * @property {Object} payload - Data to be transferred to storage service along
- * with file.
- *
+ * @property {Array.<{name: String, value: Object}>} postData - POST data to be
+ * transferred to storage service along with credentials.
  */
 
 /**
@@ -108,7 +116,9 @@ Slingshot.Directive = function (service, directive) {
   check(directive, _.defaults({
     authorize: Function,
     maxSize: Number,
-    allowedFileTypes: matchAllowedFileTypes
+    allowedFileTypes: matchAllowedFileTypes,
+    cacheControl: Match.Optional(String),
+    contentDisposition: Match.Optional(Match.OneOf(String, null))
   }, service.directiveMatch));
 
   /**
@@ -204,7 +214,7 @@ _.extend(Slingshot.Directive.prototype, {
   },
 
   /**
-   *
+   * @param {{userId: String}} method
    * @param {FileInfo} file
    * @param {Object} [meta]
    *
@@ -212,7 +222,20 @@ _.extend(Slingshot.Directive.prototype, {
    */
 
   getInstructions: function (method, file, meta) {
-    return this.storageService().upload(method, this._directive, file, meta);
+    var instructions = this.storageService().upload(method, _.extend({
+      contentDisposition: "inline; filename=" + quoteString(file.name, '"')
+    }, this._directive), file, meta);
+
+    check(instructions, {
+      upload: String,
+      download: String,
+      postData: [{
+        name: String,
+        value: Object
+      }]
+    });
+
+    return instructions;
   }
 });
 
@@ -230,9 +253,15 @@ Meteor.methods({
   "slingshot/uploadRequest": function (directiveName, file, meta) {
     check(directiveName, String);
     check(file, {
-      type: String,
+      type: Match.Where(function (type) {
+        check(type, String);
+        return type.test("^[^\/]+\/[^\/]+$");
+      }),
       name: String,
-      size: Number
+      size: Match.Where(function (size) {
+        check(size, Number);
+        return size >= 0;
+      })
     });
     check(meta, Match.Optional(Object));
 
@@ -269,4 +298,9 @@ function formatBytes(size) {
   }
 
   return (Math.round(size * 100) / 100) + " " + unit;
+}
+
+
+function quoteString(string, quotes) {
+  return quotes + string.replace(quotes, '\\' + quotes) + quotes;
 }

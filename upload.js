@@ -25,8 +25,8 @@ Slingshot.Upload = function (directive, metaData) {
   function buildFormData() {
     var formData = new window.FormData();
 
-    _.each(self.instructions.dataOrder, function (field) {
-      formData.append(field, self.instructions.payload[field]);
+    _.each(self.instructions.postData, function (field) {
+      formData.append(field.name, field.value);
     });
 
     formData.append("file", self.file);

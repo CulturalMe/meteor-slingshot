@@ -41,6 +41,7 @@ Slingshot.S3Storage = {
 
   /**
    *
+   * @param {{userId: String}} method
    * @param {Directive} directive
    * @param {FileInfo} file
    * @param {Object} [meta]
@@ -52,11 +53,14 @@ Slingshot.S3Storage = {
     var url = Npm.require("url"),
         policy = new S3Policy(directive.bucket),
         payload = {
+          key: _.isFunction(directive.key) ?
+            directive.key.call(method, file, meta) : directive.key,
           AWSAccessKeyId: directive.AWSAccessKeyId,
           "Content-Type": file.type,
           acl: directive.acl,
-          key: _.isFunction(directive.key) ?
-            directive.key.call(method, file, meta) : directive.key
+
+          "Cache-Control": directive.cacheControl,
+          "Content-Disposition": directive.contentDisposition
         },
         domain = this.domain ? url.parse(this.domain) : url.format({
             protocol: "https",
@@ -73,8 +77,15 @@ Slingshot.S3Storage = {
     return {
       upload: url.format(_.omit(domain, "pathname")),
       download: url.format(domain),
-      payload: payload,
-      dataOrder: ["key"].concat(_.keys(payload))
+      postData: [{
+        name: "key",
+        value: payload.key
+      }].concat(_.chain(payload).omit("key").map(function (value, name) {
+          return {
+            name: name,
+            value: value
+          };
+      }).value())
     };
   }
 };
