@@ -1,7 +1,7 @@
 meteor-slingshot
 ================
 
-Direct file-uploads to s3 and other storage services for meteor.js.
+Direct and secure file-uploads to s3 and other cloud storage services.
 
 ## Why?
 
@@ -19,6 +19,19 @@ File uploads can not only be restricted by file-size and file-type, but also by
 other stateful criteria such as the current meteor user.
 
 ## Simple AWS S3 example
+
+
+### Client side
+
+On the client side we can now upload files through to the bucket:
+
+```JavaScript
+var uploader = Slingshot.upload("myFileUploads");
+
+uploader.send(document.getElementById('input').files[0], function (error, url) {
+  Meteor.users.update(Meteor.userId(), {$push: {"profile.files": url}});
+});
+```
 
 ### Server side
 
@@ -48,17 +61,6 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 This directive will not allow any files other than images to be uploaded. The
 policy is directed by the meteor app server and enforced by AWS S3.
 
-### Client side
-
-On the client side we can now upload files through to the bucket:
-
-```JavaScript
-var uploader = Slingshot.upload("myFileUploads");
-
-uploader.send(document.getElementById('input').files[0], function (error, url) {
-  Meteor.users.update(Meteor.userId(), {$push: {"profile.files": url}});
-});
-```
 
 ## Setup
 

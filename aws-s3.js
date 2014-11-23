@@ -48,7 +48,7 @@ Slingshot.S3Storage = {
    * @returns {UploadInstructions}
    */
 
-  upload: function (directive, file, meta) {
+  upload: function (method, directive, file, meta) {
     var url = Npm.require("url"),
         policy = new S3Policy(directive.bucket),
         payload = {
@@ -56,7 +56,7 @@ Slingshot.S3Storage = {
           "Content-Type": file.type,
           acl: directive.acl,
           key: _.isFunction(directive.key) ?
-            directive.key(file, meta) : directive.key
+            directive.key.call(method, file, meta) : directive.key
         },
         domain = this.domain ? url.parse(this.domain) : url.format({
             protocol: "https",

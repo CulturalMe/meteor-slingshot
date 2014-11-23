@@ -1,5 +1,5 @@
 /**
- * @module meteor-file-post
+ * @module meteor-slingshot
  */
 
 Slingshot = {};
@@ -142,9 +142,9 @@ _.extend(Slingshot.Directive.prototype, {
    * @returns {Boolean}
    */
 
-  requestAuthorization: function (file, meta) {
+  requestAuthorization: function (method, file, meta) {
     return this.checkFileSize(file.size) && this.checkFileType(file.type) &&
-      this._directive.authorize(file, meta);
+      this._directive.authorize.call(method, file, meta);
   },
 
   /**
@@ -211,8 +211,8 @@ _.extend(Slingshot.Directive.prototype, {
    * @returns UploadInstructions
    */
 
-  getInstructions: function (file, meta) {
-    return this.storageService().upload(file, meta);
+  getInstructions: function (method, file, meta) {
+    return this.storageService().upload(method, this._directive, file, meta);
   }
 });
 
@@ -243,12 +243,12 @@ Meteor.methods({
         "The directive " + directiveName + " does not seem to exist");
     }
 
-    if (!directive.requestAuthorization(file, meta)) {
+    if (!directive.requestAuthorization(this, file, meta)) {
       throw new Meteor.Error("Unauthorized", "You are not allowed to " +
         "upload this file");
     }
 
-    return directive.getInstructions(file, meta);
+    return directive.getInstructions(this, file, meta);
   }
 });
 
