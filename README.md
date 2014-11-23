@@ -8,6 +8,7 @@ Direct and secure file-uploads to AWS S3, Google Cloud Storage and others.
 ```bash
 meteor add edgee:slingshot
 ```
+(not published yet!)
 
 ## Why?
 
@@ -68,7 +69,11 @@ policy is directed by the meteor app server and enforced by AWS S3.
 
 ## Storage services
 
-The client side is no
+The client side is agnostic which to which storage service is used. All it
+needs, is a directive.
+
+There is no limit imposed on how many directives can be declared for each
+storage service.
 
 ### AWS S3
 
@@ -121,7 +126,7 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
 });
 ```
 
-## Reference
+## API Reference
 
 ### Directives
 
