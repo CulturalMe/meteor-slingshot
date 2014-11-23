@@ -5,12 +5,15 @@ Package.describe({
 });
 
 Package.on_use(function (api) {
-  api.use(["mongo-livedata", "edgee-aws"], "server");
   api.use(["underscore", "check"]);
   api.use("tracker", "client");
 
-  api.add_files("upload.js", "client");
-  api.add_files(["directive.js","aws-s3.js"], "server");
+  api.add_files("lib/upload.js", "client");
+  api.add_files([
+    "lib/directive.js",
+    "services/aws-s3.js",
+    "services/google-cloud.js"
+  ], "server");
 
   api.export("Slingshot");
 });
