@@ -22,6 +22,8 @@ browser without ever exposing your secret access key or any other sensitive data
 to the client and without requiring public write access to cloud storage to the
 entire public.
 
+<img src="https://cdn.rawgit.com/CulturalMe/meteor-slingshot/master/docs/slingshot.png"/>
+
 File uploads can not only be restricted by file-size and file-type, but also by
 other stateful criteria such as the current meteor user.
 
