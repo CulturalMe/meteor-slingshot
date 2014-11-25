@@ -34,7 +34,7 @@ other stateful criteria such as the current meteor user.
 On the client side we can now upload files through to the bucket:
 
 ```JavaScript
-var uploader = Slingshot.upload("myFileUploads");
+var uploader = new Slingshot.Upload("myFileUploads");
 
 uploader.send(document.getElementById('input').files[0], function (error, url) {
   Meteor.users.update(Meteor.userId(), {$push: {"profile.files": url}});
