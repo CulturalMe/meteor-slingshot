@@ -77,6 +77,49 @@ needs, is a directive.
 There is no limit imposed on how many directives can be declared for each
 storage service.
 
+## Progress bars
+
+For progress bars of the upload use:
+
+```handlebars
+<template name="progressBar">
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%;">
+      <span class="sr-only">{{progress}}% Complete</span>
+    </div>
+  </div>
+</template>
+```
+
+Using the `Slingshot.Upload` instance read and react to the progress:
+
+```JavaScript
+Template.progressBar.helpers({
+  progress: function () {
+    return Math.round(this.uploader.progress() * 100);
+  }
+}):
+```
+
+## Show image before its uploaded (latency compensation)
+
+```handlebars
+<template name="myPicture">
+  <img src={{url}}/>
+</template>
+```
+
+```JavaScript
+Template.myPicture.helpers({
+  url: function () {
+    return this.uploader.url():
+  }
+});
+```
+
+This will use `FileReader` to show the image from the local source until it is
+uploaded to the server.
+
 ### AWS S3
 
 You will need a`AWSAccessKeyId` and `AWSSecretAccessToken` ins `Meteor.settings`
