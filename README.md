@@ -101,7 +101,7 @@ Template.progressBar.helpers({
 }):
 ```
 
-## Show image before its uploaded (latency compensation)
+## Show uploaded image before it is uploaded (latency compensation)
 
 ```handlebars
 <template name="myPicture">
