@@ -8,7 +8,6 @@ Direct and secure file-uploads to AWS S3, Google Cloud Storage and others.
 ```bash
 meteor add edgee:slingshot
 ```
-(not published yet!)
 
 ## Why?
 
