@@ -196,15 +196,19 @@ CDN.
 service. If a function is provided, it will be called with `userId` in the
 context and its return value is used as the key.
 
-`expire` Number (required) - Number of milliseconds in which an upload
-authorization will expire after the request was made.
+`expire` Number (optional) - Number of milliseconds in which an upload
+authorization will expire after the request was made. Default is 5 minutes.
 
 `acl` String (optional)
 
-`AWSAccessKeyId` String (required for AWS S3)
+`AWSAccessKeyId` String (required for AWS S3) - Can also be set in
+`Meteor.settings`
 
-`AWSSecretAccessKey` String (required for AWS S3)
+`AWSSecretAccessKey` String (required for AWS S3) - Can also be set in
+`Meteor.settings`
 
-`GoogleAccessId` String (required for Google Cloud Storage)
+`GoogleAccessId` String (required for Google Cloud Storage) - Can also be set in
+`Meteor.settings`
 
-`GoogleSecretKey` String (required for Google Cloud Storage)
+`GoogleSecretKey` String (required for Google Cloud Storage) - Can also be set
+in `Meteor.settings`
