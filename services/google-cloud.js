@@ -70,7 +70,8 @@ Slingshot.GoogleCloud = {
           pathname: payload.key
         };
 
-    payload.policy = policy.match(payload).stringify();
+    payload.policy = policy.match(_.omit(payload, "GoogleAccessId"))
+      .stringify();
     payload.signature = this.sign(directive.GoogleSecretKey, payload.policy);
 
     return {

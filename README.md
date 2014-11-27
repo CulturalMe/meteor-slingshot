@@ -158,6 +158,11 @@ using openssl:
 openssl pkcs12 -in google-cloud-service-key.p12 -nodes -nocerts > google-cloud-service-key.pem
 ```
 
+Setup CORS on the bucket:
+
+```
+gsutil cors set docs/gs-cors.json gs://mybucket
+```
 
 Save this file into the `/private` directory of your meteor app and add this
 line to your server-side code:

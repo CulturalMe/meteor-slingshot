@@ -74,7 +74,8 @@ Slingshot.S3Storage = {
             pathname: payload.key
         };
 
-    payload.policy = policy.match(payload).stringify();
+    payload.policy = policy.match(_.omit(payload, "AWSAccessKeyId"))
+      .stringify();
     payload.signature = this.sign(directive.AWSSecretAccessKey, payload.policy);
 
     return {
