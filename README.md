@@ -55,6 +55,8 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
       var message = "Please login before posting files";
       throw new Meteor.Error("Login Required", message);
     }
+
+    return true;
   },
 
   key: function (file) {
@@ -156,6 +158,7 @@ using openssl:
 openssl pkcs12 -in google-cloud-service-key.p12 -nodes -nocerts > google-cloud-service-key.pem
 ```
 
+
 Save this file into the `/private` directory of your meteor app and add this
 line to your server-side code:
 
@@ -169,6 +172,14 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
   //...
 });
 ```
+
+## Browser Compatibility
+
+Currently the uploader uses `XMLHttpRequest 2` to upload the files, which is not
+supported on Internet Explorer 9 and older versions of Internet Explorer.
+
+This can be circumvented by falling back to iframe uploads in future versions,
+if required.
 
 ## API Reference
 
@@ -187,7 +198,9 @@ null for any file type.
 `contentDisposition` String (required) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-`bucket` String (required) - Name of bucket to use.
+`bucket` String (required) - Name of bucket to use. Google Cloud it default is
+`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
+`Meteor.settings.S3Bucket`.
 
 `domain` String (optional) - Override domain to use to access bucket. Useful for
 CDN.

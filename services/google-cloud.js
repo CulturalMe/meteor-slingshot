@@ -64,12 +64,11 @@ Slingshot.GoogleCloud = {
           "Cache-Control": directive.cacheControl,
           "Content-Disposition": directive.contentDisposition
         },
-        domain = url.format({
+        domain = {
           protocol: "https",
-          host: directive.domain || directive.bucket + ".storage.googleapis.com"
-        });
-
-    domain.pathname = payload.key;
+          host: directive.domain || directive.bucket + ".storage.googleapis.com",
+          pathname: payload.key
+        };
 
     payload.policy = policy.match(payload).stringify();
     payload.signature = this.sign(directive.GoogleSecretKey, payload.policy);
@@ -81,11 +80,11 @@ Slingshot.GoogleCloud = {
         name: "key",
         value: payload.key
       }].concat(_.chain(payload).omit("key").map(function (value, name) {
-          return {
+          return !_.isUndefined(value) && {
             name: name,
             value: value
           };
-        }).value()
+        }).compact().value()
       )
     };
   },
