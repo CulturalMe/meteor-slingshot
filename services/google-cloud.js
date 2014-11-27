@@ -66,7 +66,8 @@ Slingshot.GoogleCloud = {
         },
         domain = {
           protocol: "https",
-          host: directive.domain || directive.bucket + ".storage.googleapis.com",
+          host: directive.domain || directive.bucket +
+            ".storage.googleapis.com",
           pathname: payload.key
         };
 
