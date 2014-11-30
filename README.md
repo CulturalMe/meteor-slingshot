@@ -74,8 +74,8 @@ policy is directed by the meteor app server and enforced by AWS S3.
 
 ## Storage services
 
-The client side is agnostic which to which storage service is used. All it
-needs, is a directive.
+The client side is agnostic to which storage service is used. All it
+needs, is a directive name.
 
 There is no limit imposed on how many directives can be declared for each
 storage service.
@@ -187,6 +187,16 @@ supported on Internet Explorer 9 and older versions of Internet Explorer.
 
 This can be circumvented by falling back to iframe uploads in future versions,
 if required.
+
+## Security
+
+The secret key never leaves the meteor app server. Nobody will be able to upload 
+anything to your buckets outside of your meteor app.
+
+Instead of using secret access keys, Slingshot uses a policy document that is
+sent to along with the file AWS S3 or Google Cloud Storage. This policy is
+signed by the secret key and contains all the restrictions that you define in
+the directive. By default a signed policy expires after 5 minutes.
 
 ## API Reference
 
