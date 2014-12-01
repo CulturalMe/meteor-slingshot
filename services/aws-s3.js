@@ -52,7 +52,7 @@ Slingshot.S3Storage = {
     var url = Npm.require("url"),
         policy = new Slingshot.StoragePolicy()
           .expireIn(directive.expire)
-          .contentLength(0, Math.min(file.size, directive.maxSize)),
+          .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
 
         payload = {
           key: _.isFunction(directive.key) ?
