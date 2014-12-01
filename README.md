@@ -120,8 +120,7 @@ Template.myPicture.helpers({
 });
 ```
 
-This will use `FileReader` to show the image from the local source until it is
-uploaded to the server.
+This will use [Blob URLs](http://caniuse.com/#feat=bloburls) to show the image from the local source until it is uploaded to the server. If Blob URL's are not available it will attempt to use `FileReader` to generate a base64 encoded url representing the data as a fallback.
 
 ### AWS S3
 
@@ -188,6 +187,8 @@ supported on Internet Explorer 9 and older versions of Internet Explorer.
 This can be circumvented by falling back to iframe uploads in future versions,
 if required.
 
+Latency compensation is available in Internet Explorer 10.
+
 ## Security
 
 The secret key never leaves the meteor app server. Nobody will be able to upload
@@ -197,6 +198,15 @@ Instead of using secret access keys, Slingshot uses a policy document that is
 sent to along with the file AWS S3 or Google Cloud Storage. This policy is
 signed by the secret key and contains all the restrictions that you define in
 the directive. By default a signed policy expires after 5 minutes.
+
+## Dependencies
+
+Meteor core packages:
+
+ * underscore
+ * tracker
+ * reactive-var
+ * check
 
 ## API Reference
 
