@@ -125,7 +125,7 @@ uploaded to the server.
 
 ### AWS S3
 
-You will need a`AWSAccessKeyId` and `AWSSecretAccessToken` ins `Meteor.settings`
+You will need a`AWSAccessKeyId` and `AWSSecretAccessKey` in `Meteor.settings`
 and a bucket with the following CORS configuration:
 
 ```xml
