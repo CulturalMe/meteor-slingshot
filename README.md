@@ -190,7 +190,7 @@ if required.
 
 ## Security
 
-The secret key never leaves the meteor app server. Nobody will be able to upload 
+The secret key never leaves the meteor app server. Nobody will be able to upload
 anything to your buckets outside of your meteor app.
 
 Instead of using secret access keys, Slingshot uses a policy document that is
@@ -204,8 +204,8 @@ the directive. By default a signed policy expires after 5 minutes.
 
 `authorize`: Function (required) - Function to determines if upload is allowed.
 
-`maxSize`: Number (required) - Maximum file-size (in bytes). Use null for
-unlimited.
+`maxSize`: Number (required) - Maximum file-size (in bytes). Use `null` or `0`
+for unlimited.
 
 `allowedFileTypes` RegExp, String or Array (required) - Allowed MIME types. Use
 null for any file type.
