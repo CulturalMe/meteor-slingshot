@@ -125,7 +125,7 @@ uploaded to the server.
 
 ### AWS S3
 
-You will need a`AWSAccessKeyId` and `AWSSecretAccessToken` ins `Meteor.settings`
+You will need a`AWSAccessKeyId` and `AWSSecretAccessKey` in `Meteor.settings`
 and a bucket with the following CORS configuration:
 
 ```xml
@@ -190,7 +190,7 @@ if required.
 
 ## Security
 
-The secret key never leaves the meteor app server. Nobody will be able to upload 
+The secret key never leaves the meteor app server. Nobody will be able to upload
 anything to your buckets outside of your meteor app.
 
 Instead of using secret access keys, Slingshot uses a policy document that is
