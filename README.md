@@ -35,8 +35,8 @@ On the client side we can now upload files through to the bucket:
 ```JavaScript
 var uploader = new Slingshot.Upload("myFileUploads");
 
-uploader.send(document.getElementById('input').files[0], function (error, url) {
-  Meteor.users.update(Meteor.userId(), {$push: {"profile.files": url}});
+uploader.send(document.getElementById('input').files[0], function (error, downloadUrl) {
+  Meteor.users.update(Meteor.userId(), {$push: {"profile.files": downloadUrl}});
 });
 ```
 
