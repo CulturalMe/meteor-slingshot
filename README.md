@@ -115,7 +115,8 @@ Template.progressBar.helpers({
 ```JavaScript
 Template.myPicture.helpers({
   url: function () {
-    return this.uploader.url():
+    //pass true to download the image into cache (preload) before using it.
+    return this.uploader.url(true);
   }
 });
 ```
