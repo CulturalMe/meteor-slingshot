@@ -48,7 +48,7 @@ On the server we declare a directive that controls upload access rules:
 Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
   bucket: "mybucket",
   allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
-
+  maxSize: 0,
   acl: "public-read",
 
   authorize: function () {
