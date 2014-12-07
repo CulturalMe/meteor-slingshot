@@ -1,5 +1,10 @@
 Slingshot.S3Storage = {
 
+  accessId: "AWSAccessKeyId",
+
+  secretKey: "AWSSecretAccessKey",
+
+
   directiveMatch: {
     bucket: String,
     domain: Match.Optional(String),
@@ -38,6 +43,11 @@ Slingshot.S3Storage = {
     })
     .value(),
 
+
+  host: function (directive) {
+    return directive.bucket + ".s3.amazonaws.com";
+  },
+
   /**
    *
    * @param {{userId: String}} method
@@ -58,8 +68,6 @@ Slingshot.S3Storage = {
           key: _.isFunction(directive.key) ?
             directive.key.call(method, file, meta) : directive.key,
 
-          AWSAccessKeyId: directive.AWSAccessKeyId,
-
           bucket: directive.bucket,
 
           "Content-Type": file.type,
@@ -70,13 +78,15 @@ Slingshot.S3Storage = {
         },
         domain = {
             protocol: "https",
-            host: directive.domain || directive.bucket + ".s3.amazonaws.com",
+            host: directive.domain || this.host(directive),
             pathname: payload.key
         };
 
-    payload.policy = policy.match(_.omit(payload, "AWSAccessKeyId"))
-      .stringify();
-    payload.signature = this.sign(directive.AWSSecretAccessKey, payload.policy);
+
+    payload[this.accessId] = directive[this.accessId];
+
+    payload.policy = policy.match(_.omit(payload, this.accessId)).stringify();
+    payload.signature = this.sign(directive[this.secretKey], payload.policy);
 
     return {
       upload: url.format(_.omit(domain, "pathname")),
