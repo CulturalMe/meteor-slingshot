@@ -4,6 +4,8 @@ Slingshot.RackspaceFiles = {
     RackspaceAccountId: String,
     RackspaceSecretKey: String,
     container: String,
+    region: String,
+    cdn: String,
     pathPrefix: Match.OneOf(String, Function),
     expire: Match.Where(function (expire) {
       check(expire, Number);
@@ -14,16 +16,20 @@ Slingshot.RackspaceFiles = {
     deleteAfter: Match.Optional(Number)
   },
 
-  directiveDefault: {
-    expire: 5 * 60 * 1000 //in 5 minutes
-  },
+  directiveDefault: _.chain(Meteor.settings)
+    .pick("RackspaceAccountId", "RackspaceSecretKey")
+    .extend({
+      region: "iad3",
+      expire: 5 * 60 * 1000 //in 5 minutes
+    })
+    .value(),
 
   version: "v1",
 
   path: function (method, directive, file, meta) {
     var path = [
       this.version,
-      directive.RackspaceAccountId,
+      "MossoCloudFS_" + directive.RackspaceAccountId,
       directive.container
     ];
 
@@ -35,13 +41,15 @@ Slingshot.RackspaceFiles = {
     return ("/" + path.join("/")).replace(/\/+/, "/");
   },
 
-  host: "https://storage.clouddrive.com",
+  host: function (region) {
+    return "https://storage101." + region + ".clouddrive.com";
+  },
 
   maxSize: 0x140000000, //5GB
 
   upload: function (method, directive, file, meta) {
     var path = this.path(method, directive, file, meta),
-        host = _.result(this, "host"),
+        host = this.host(directive.region),
         url = host + path,
         data = [
           {
@@ -69,19 +77,19 @@ Slingshot.RackspaceFiles = {
 
     if ("deleteAt" in directive)
       data.push({
-        name: "x-delete-at",
+        name: "x_delete_at",
         value: directive.deleteAt.getTime()
       });
 
     if ("deleteAfter" in directive)
       data.push({
-        name: "x-delete-after",
+        name: "x_delete_after",
         value: Math.round(directive.deleteAfter / 1000)
       });
 
     return {
       upload: url,
-      download: url + "/" + file.name,
+      download: directive.cdn + path + "/" + file.name,
       postData: data
     };
   },
