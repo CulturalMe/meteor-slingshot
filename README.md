@@ -170,7 +170,7 @@ Save this file into the `/private` directory of your meteor app and add this
 line to your server-side code:
 
 ```JavaScript
-Slingshot.GoogleCloud.defaultDirective.GoogleSecretKey = Assets.getText('google-cloud-service-key.pem');
+Slingshot.GoogleCloud.directiveDefault.GoogleSecretKey = Assets.getText('google-cloud-service-key.pem');
 ```
 Declare Google Cloud Storage Directives as follows:
 
