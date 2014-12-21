@@ -212,7 +212,7 @@ Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFIles, {
 });
 ```
 
-To setup you need to generate an
+To setup CORS you need to generate an
 [auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
 and then use:
 
