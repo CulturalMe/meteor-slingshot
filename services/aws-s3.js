@@ -7,7 +7,7 @@ Slingshot.S3Storage = {
 
   directiveMatch: {
     bucket: String,
-    domain: Match.Optional(String),
+    bucketUrl: Match.OneOf(String, Function),
 
     AWSAccessKeyId: String,
     AWSSecretAccessKey: String,
@@ -32,21 +32,22 @@ Slingshot.S3Storage = {
       check(expire, Number);
 
       return expire > 0;
-    })
+    }),
+
+    cacheControl: Match.Optional(String),
+    contentDisposition: Match.Optional(Match.OneOf(String, null))
   },
 
   directiveDefault: _.chain(Meteor.settings)
     .pick("AWSAccessKeyId", "AWSSecretAccessKey")
     .extend({
       bucket: Meteor.settings.S3Bucket,
+      bucketUrl: function (bucket) {
+        return "https://" + bucket + ".s3.amazonaws.com"
+      },
       expire: 5 * 60 * 1000 //in 5 minutes
     })
     .value(),
-
-
-  host: function (directive) {
-    return directive.bucket + ".s3.amazonaws.com";
-  },
 
   /**
    *
@@ -60,6 +61,7 @@ Slingshot.S3Storage = {
 
   upload: function (method, directive, file, meta) {
     var url = Npm.require("url"),
+
         policy = new Slingshot.StoragePolicy()
           .expireIn(directive.expire)
           .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
@@ -76,21 +78,21 @@ Slingshot.S3Storage = {
           "Cache-Control": directive.cacheControl,
           "Content-Disposition": directive.contentDisposition
         },
-        domain = {
-            protocol: "https",
-            host: directive.domain || this.host(directive),
-            pathname: payload.key
-        };
 
+        bucketUrl = _.isFunction(directive.bucketUrl) ?
+          directive.bucketUrl(directive.bucket) : directive.bucketUrl,
+
+        download = _.extend(url.parse(directive.cdn || bucketUrl), {
+          pathname: payload.key
+        });
 
     payload[this.accessId] = directive[this.accessId];
-
     payload.policy = policy.match(_.omit(payload, this.accessId)).stringify();
     payload.signature = this.sign(directive[this.secretKey], payload.policy);
 
     return {
-      upload: url.format(_.omit(domain, "pathname")),
-      download: url.format(domain),
+      upload: bucketUrl,
+      download: url.format(download),
       postData: [{
         name: "key",
         value: payload.key

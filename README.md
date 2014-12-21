@@ -257,6 +257,8 @@ Meteor core packages:
 
 ### Directives
 
+#### General
+
 `authorize`: Function (required) - Function to determines if upload is allowed.
 
 `maxSize`: Number (required) - Maximum file-size (in bytes). Use `null` or `0`
@@ -265,40 +267,41 @@ for unlimited.
 `allowedFileTypes` RegExp, String or Array (required) - Allowed MIME types. Use
 null for any file type. **Warning: This is not enforced on rackspace**
 
+`cdn` String (optional) - CDN URL domain for downloads.
+i.e. `"https://d111111abcdef8.cloudfront.net"`
+
+`expire` Number (optional) - Number of milliseconds in which an upload
+authorization will expire after the request was made. Default is 5 minutes.
+
+#### AWS S3 and Google Cloud
+
+`bucket` String (required) - Name of bucket to use.
+For Google Cloud the default is `Meteor.settings.GoogleCloudBucket`. For AWS S3
+the default bucket is `Meteor.settings.S3Bucket`.
+
+`bucketUrl` String or Function (optional) - Override URL to which files are
+ uploaded. If it is a function, then the first argument is the bucket name. This
+ url also used for downloads unless a cdn is given.
+
+`key` String or Function (required) - Name of the file on the cloud storage
+service. If a function is provided, it will be called with `userId` in the
+context and its return value is used as the key. First argument is file info and
+the second is the meta-information that can be passed by the client.
+
+`acl` String (optional)
+
 `cacheControl` String (optional) - RFC 2616 Cache-Control directive
 
 `contentDisposition` String (required) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-`bucket` String (required for Google Cloud and AWS S3) - Name of bucket to use.
-For Google Cloud the default is `Meteor.settings.GoogleCloudBucket`. For AWS S3
-the default bucket is `Meteor.settings.S3Bucket`.
+#### AWS S3 specific
 
-`container` String (required for Rackspace Cloud files) - Name of container to
-use.
+`AWSAccessKeyId` String (required) - Can also be set in `Meteor.settings`
 
-`domain` String (optional) - Override domain to use to access bucket.
+`AWSSecretAccessKey` String (require) - Can also be set in `Meteor.settings`
 
-`cdn` String (required for rackspace cloud files) - CDN domain for downloads.
-
-`key` String or Function (required for AWS S3 and Google Cloud) - Name of the
-file on the cloud storage service. If a function is provided, it will be called
-with `userId` in the context and its return value is used as the key.
-
-`pathPrefix` String or Function (required for Rackspace Cloud Files) - Prefix or
-directory in which files are stored. The rest is taken from the uploaded file's
-name and cannot be enforced.
-
-`expire` Number (optional) - Number of milliseconds in which an upload
-authorization will expire after the request was made. Default is 5 minutes.
-
-`acl` String (optional)
-
-`AWSAccessKeyId` String (required for AWS S3) - Can also be set in
-`Meteor.settings`
-
-`AWSSecretAccessKey` String (required for AWS S3) - Can also be set in
-`Meteor.settings`
+#### Google Cloud Storage specific
 
 `GoogleAccessId` String (required for Google Cloud Storage) - Can also be set in
 `Meteor.settings`
@@ -306,11 +309,20 @@ authorization will expire after the request was made. Default is 5 minutes.
 `GoogleSecretKey` String (required for Google Cloud Storage) - Can also be set
 in `Meteor.settings`
 
-`RackspaceAccountId` String (required for rackspace cloud files) - This is your
-rackspace account number. It can also be set set in `Meteor.settings`
+#### Rackspace Cloud Files
 
-`RackspaceSecretKey` String (required for rackspace cloud files) - Can also be
-set in `Meteor.settings`
+`container` String (required) - Name of container to use.
 
-`region` String (optional for rackspace cloud files) - The region used by your
-container. The default is `iad3`.
+`region` String (optional) - The region used by your container. The default is
+`iad3`.
+
+`pathPrefix` String or Function (required) - Prefix or directory in which files
+ are stored. The rest is taken from the uploaded file's name and cannot be
+ enforced.
+
+`RackspaceAccountId` String (required) - This is your rackspace account number.
+It can also be set set in `Meteor.settings`.
+
+`RackspaceSecretKey` String (required) - Can also be set in `Meteor.settings`
+
+

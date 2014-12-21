@@ -5,7 +5,6 @@ Slingshot.RackspaceFiles = {
     RackspaceSecretKey: String,
     container: String,
     region: String,
-    cdn: String,
     pathPrefix: Match.OneOf(String, Function),
     expire: Match.Where(function (expire) {
       check(expire, Number);
@@ -89,7 +88,7 @@ Slingshot.RackspaceFiles = {
 
     return {
       upload: url,
-      download: directive.cdn + path + "/" + file.name,
+      download: (directive.cdn || host) + path + "/" + file.name,
       postData: data
     };
   },

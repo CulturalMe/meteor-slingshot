@@ -1,4 +1,4 @@
-//GoogleCloud is based on the very same method as AWS S3, so we extend it:
+//GoogleCloud is based on the very same api as AWS S3, so we extend it:
 
 Slingshot.GoogleCloud = _.defaults({
 
@@ -29,18 +29,13 @@ Slingshot.GoogleCloud = _.defaults({
 
   directiveDefault:  _.chain(Meteor.settings)
     .pick("GoogleAccessId")
-    .extend(Slingshot.S3Storage.directiveDefault)
+    .extend(Slingshot.S3Storage.directiveDefault, {
+      bucketUrl: function (bucket) {
+        return "https://" + bucket + ".storage.googleapis.com";
+      }
+    })
     .omit(Slingshot.S3Storage.accessId, Slingshot.S3Storage.secretKey)
     .value(),
-
-  /**
-   * @param {Directive} directive
-   * @returns {string}
-   */
-
-  host: function (directive) {
-    return directive.bucket + ".storage.googleapis.com";
-  },
 
   /**
    * @param {String} secretKey - pem private key
