@@ -121,7 +121,10 @@ Template.myPicture.helpers({
 });
 ```
 
-This will use [Blob URLs](http://caniuse.com/#feat=bloburls) to show the image from the local source until it is uploaded to the server. If Blob URL's are not available it will attempt to use `FileReader` to generate a base64 encoded url representing the data as a fallback.
+This will use [Blob URLs](http://caniuse.com/#feat=bloburls) to show the image
+from the local source until it is uploaded to the server. If Blob URL's are not
+available it will attempt to use `FileReader` to generate a base64-encoded url
+representing the data as a fallback.
 
 ### AWS S3
 
@@ -267,7 +270,7 @@ for unlimited.
 `allowedFileTypes` RegExp, String or Array (required) - Allowed MIME types. Use
 null for any file type. **Warning: This is not enforced on rackspace**
 
-`cdn` String (optional) - CDN URL domain for downloads.
+`cdn` String (optional) - CDN domain for downloads.
 i.e. `"https://d111111abcdef8.cloudfront.net"`
 
 `expire` Number (optional) - Number of milliseconds in which an upload
@@ -297,17 +300,15 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 #### AWS S3 specific
 
-`AWSAccessKeyId` String (required) - Can also be set in `Meteor.settings`
+`AWSAccessKeyId` String (required) - Can also be set in `Meteor.settings`.
 
-`AWSSecretAccessKey` String (require) - Can also be set in `Meteor.settings`
+`AWSSecretAccessKey` String (required) - Can also be set in `Meteor.settings`.
 
 #### Google Cloud Storage specific
 
-`GoogleAccessId` String (required for Google Cloud Storage) - Can also be set in
-`Meteor.settings`
+`GoogleAccessId` String (required) - Can also be set in `Meteor.settings`.
 
-`GoogleSecretKey` String (required for Google Cloud Storage) - Can also be set
-in `Meteor.settings`
+`GoogleSecretKey` String (required) - Can also be set in `Meteor.settings`.
 
 #### Rackspace Cloud Files
 
@@ -318,11 +319,11 @@ in `Meteor.settings`
 
 `pathPrefix` String or Function (required) - Prefix or directory in which files
  are stored. The rest is taken from the uploaded file's name and cannot be
- enforced.
+ enforced. If a function is provided, it will be called with `userId` in the
+ context and its return value is used as the key. First argument is file info
+ and the second is the meta-information that can be passed by the client.
 
 `RackspaceAccountId` String (required) - This is your rackspace account number.
 It can also be set set in `Meteor.settings`.
 
-`RackspaceSecretKey` String (required) - Can also be set in `Meteor.settings`
-
-
+`RackspaceSecretKey` String (required) - Can also be set in `Meteor.settings`.
