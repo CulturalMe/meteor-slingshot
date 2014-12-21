@@ -76,7 +76,8 @@ Slingshot.S3Storage = {
           "acl": directive.acl,
 
           "Cache-Control": directive.cacheControl,
-          "Content-Disposition": directive.contentDisposition
+          "Content-Disposition": directive.contentDisposition ||
+            "inline; filename=" + quoteString(file.name, '"')
         },
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
@@ -120,3 +121,7 @@ Slingshot.S3Storage = {
       .digest("base64");
   }
 };
+
+function quoteString(string, quotes) {
+  return quotes + string.replace(quotes, '\\' + quotes) + quotes;
+}
