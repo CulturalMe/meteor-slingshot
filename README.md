@@ -180,6 +180,50 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
 });
 ```
 
+### Rackspace Cloud Files
+
+You will need a`RackspaceAccountId` and `RackspaceSecretKey` in
+`Meteor.settings`. `RackspaceAccountId` is your account number.
+`RackspaceSecretKey` is your API auth token.
+
+You need container and provide its name and region.
+
+```JavaScript
+Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFIles, {
+  container: "myContainer",
+  region: "lon3",
+
+  authorize: function () {
+    //Deny uploads if user is not logged in.
+
+    if (!this.userId) {
+      var message = "Please login before posting files";
+      throw new Meteor.Error("Login Required", message);
+    }
+
+    return true;
+  },
+
+  pathPrefix: function (file) {
+    //Store file into a directory by the user's username.
+    var user = Meteor.users.findOne(this.userId);
+    return user.username;
+  }
+});
+```
+
+To setup you need to generate an
+[auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
+and then use:
+
+(Does not seem to work yet)
+
+```bash
+curl -I -X HEAD -H 'X-Auth-Token: yourAuthToken' \
+  -H 'X-Container-Meta-Access-Control-Allow-Origin: *' \
+  https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
+```
+
 ## Browser Compatibility
 
 Currently the uploader uses `XMLHttpRequest 2` to upload the files, which is not
@@ -219,23 +263,31 @@ Meteor core packages:
 for unlimited.
 
 `allowedFileTypes` RegExp, String or Array (required) - Allowed MIME types. Use
-null for any file type.
+null for any file type. **Warning: This is not enforced on rackspace**
 
 `cacheControl` String (optional) - RFC 2616 Cache-Control directive
 
 `contentDisposition` String (required) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-`bucket` String (required) - Name of bucket to use. Google Cloud it default is
-`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
-`Meteor.settings.S3Bucket`.
+`bucket` String (required for Google Cloud and AWS S3) - Name of bucket to use.
+For Google Cloud the default is `Meteor.settings.GoogleCloudBucket`. For AWS S3
+the default bucket is `Meteor.settings.S3Bucket`.
 
-`domain` String (optional) - Override domain to use to access bucket. Useful for
-CDN.
+`container` String (required for Rackspace Cloud files) - Name of container to
+use.
 
-`key` String or Function (required) - Name of the file on the cloud storage
-service. If a function is provided, it will be called with `userId` in the
-context and its return value is used as the key.
+`domain` String (optional) - Override domain to use to access bucket.
+
+`cdn` String (required for rackspace cloud files) - CDN domain for downloads.
+
+`key` String or Function (required for AWS S3 and Google Cloud) - Name of the
+file on the cloud storage service. If a function is provided, it will be called
+with `userId` in the context and its return value is used as the key.
+
+`pathPrefix` String or Function (required for Rackspace Cloud Files) - Prefix or
+directory in which files are stored. The rest is taken from the uploaded file's
+name and cannot be enforced.
 
 `expire` Number (optional) - Number of milliseconds in which an upload
 authorization will expire after the request was made. Default is 5 minutes.
@@ -253,3 +305,12 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `GoogleSecretKey` String (required for Google Cloud Storage) - Can also be set
 in `Meteor.settings`
+
+`RackspaceAccountId` String (required for rackspace cloud files) - This is your
+rackspace account number. It can also be set set in `Meteor.settings`
+
+`RackspaceSecretKey` String (required for rackspace cloud files) - Can also be
+set in `Meteor.settings`
+
+`region` String (optional for rackspace cloud files) - The region used by your
+container. The default is `iad3`.
