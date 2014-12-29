@@ -10,7 +10,8 @@ Package.on_use(function (api) {
 
   api.use(["underscore", "check"]);
   api.use(["tracker", "reactive-var"], "client");
-
+  
+  api.add_files("lib/restrictions.js", ["client", "server"]);
   api.add_files("lib/upload.js", "client");
   api.add_files([
     "lib/directive.js",
