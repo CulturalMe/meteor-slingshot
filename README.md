@@ -99,7 +99,7 @@ if (error) {
 }
 ```
 
-The validate method will return `true` if valid and returns an `Error instance` if validation fails.
+The validate method will return `null` if valid and returns an `Error instance` if validation fails.
 
 
 ## Storage services
