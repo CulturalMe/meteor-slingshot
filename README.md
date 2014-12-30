@@ -93,9 +93,9 @@ Now Slingshot will validate the file before sending the authorization request to
 ```JavaScript
 var uploader = new Slingshot.Upload("myFileUploads");
 
-var isValid = uploader.validate(document.getElementById('input').files[0]);
-if (isValid !== true) {
-  console.error(isValid);
+var error = uploader.validate(document.getElementById('input').files[0]);
+if (error) {
+  console.error(error);
 }
 ```
 
