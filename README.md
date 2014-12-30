@@ -72,6 +72,36 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 This directive will not allow any files other than images to be uploaded. The
 policy is directed by the meteor app server and enforced by AWS S3.
 
+## Client side validation
+
+On both client and server side we declare file restrictions for our directive:
+
+```Javascript
+Slingshot.fileRestrictions("myFileUploads", {
+  allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
+  maxSize: 1*0x400*0x400, //1MB,
+  authorize: function() {
+    return this.userId
+  }
+});
+```
+
+Now Slingshot will validate the file before sending the authorization request to the server.
+
+
+### Manual validation
+```JavaScript
+var uploader = new Slingshot.Upload("myFileUploads");
+
+var isValid = uploader.validate(document.getElementById('input').files[0]);
+if (isValid !== true) {
+  console.error(isValid);
+}
+```
+
+The validate method will return `true` if valid and returns an `Error instance` if validation fails.
+
+
 ## Storage services
 
 The client side is agnostic to which storage service is used. All it
@@ -253,3 +283,13 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `GoogleSecretKey` String (required for Google Cloud Storage) - Can also be set
 in `Meteor.settings`
+
+### File restrictions
+
+`authorize`: Function (optional) - Function to determines if upload is allowed.
+
+`maxSize`: Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
+for unlimited.
+
+`allowedFileTypes` RegExp, String or Array (optional) - Allowed MIME types. Use
+null for any file type.
