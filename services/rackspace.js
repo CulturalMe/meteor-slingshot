@@ -2,7 +2,7 @@ Slingshot.RackspaceFiles = {
 
   directiveMatch: {
     RackspaceAccountId: String,
-    RackspaceSecretKey: String,
+    RackspaceMetaDataKey: String,
     container: String,
     region: String,
     pathPrefix: Match.OneOf(String, Function),
@@ -16,7 +16,7 @@ Slingshot.RackspaceFiles = {
   },
 
   directiveDefault: _.chain(Meteor.settings)
-    .pick("RackspaceAccountId", "RackspaceSecretKey")
+    .pick("RackspaceAccountId", "RackspaceMetaDataKey")
     .extend({
       region: "iad3",
       expire: 5 * 60 * 1000 //in 5 minutes
@@ -71,7 +71,7 @@ Slingshot.RackspaceFiles = {
 
     data.push({
         name: "signature",
-        value: this.sign(directive.RackspaceSecretKey, path, data)
+        value: this.sign(directive.RackspaceMetaDataKey, path, data)
     });
 
     if ("deleteAt" in directive)

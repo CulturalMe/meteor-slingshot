@@ -185,27 +185,20 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
 
 ### Rackspace Cloud Files
 
-You will need a`RackspaceAccountId` and `RackspaceSecretKey` in
-`Meteor.settings`. `RackspaceAccountId` is your account number.
-`RackspaceSecretKey` is your API auth token.
+You will need a`RackspaceAccountId` (your acocunt number) and
+`RackspaceMetaDataKey` in `Meteor.settings`.
 
-You need container and provide its name and region.
+In order to obtain your `RackspaceMetaDataKey` you need an
+[auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
+and then follow the
+[instructions here](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Set_Account_Metadata-d1a666.html).
+
+For your container you need container and provide its name and region.
 
 ```JavaScript
 Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFIles, {
-  container: "myContainer",
-  region: "lon3",
-
-  authorize: function () {
-    //Deny uploads if user is not logged in.
-
-    if (!this.userId) {
-      var message = "Please login before posting files";
-      throw new Meteor.Error("Login Required", message);
-    }
-
-    return true;
-  },
+  container: "myContainer", //Container name
+  region: "lon3", //Region code. The default is 'iad3'
 
   pathPrefix: function (file) {
     //Store file into a directory by the user's username.
@@ -215,11 +208,7 @@ Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFIles, {
 });
 ```
 
-To setup CORS you need to generate an
-[auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
-and then use:
-
-(Does not seem to work yet)
+To setup CORS use:
 
 ```bash
 curl -I -X HEAD -H 'X-Auth-Token: yourAuthToken' \
