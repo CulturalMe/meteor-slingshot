@@ -243,27 +243,26 @@ Meteor core packages:
 
 ### Directives
 
-`authorize`: Function (required) - Function to determines if upload is allowed.
+`authorize`: Function (**required** unless set in File Restrictions)
 
-`maxSize`: Number (required) - Maximum file-size (in bytes). Use `null` or `0`
-for unlimited.
+`maxSize`: Number (**required** unless set in File Restrictions)
 
-`allowedFileTypes` RegExp, String or Array (required) - Allowed MIME types. Use
-null for any file type.
+`allowedFileTypes` RegExp, String or Array (**required** unless set in File
+Restrictions)
 
 `cacheControl` String (optional) - RFC 2616 Cache-Control directive
 
-`contentDisposition` String (required) - RFC 2616 Content-Disposition directive.
+`contentDisposition` String (**required**) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-`bucket` String (required) - Name of bucket to use. Google Cloud it default is
+`bucket` String (**required**) - Name of bucket to use. Google Cloud it default is
 `Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
 `Meteor.settings.S3Bucket`.
 
 `domain` String (optional) - Override domain to use to access bucket. Useful for
 CDN.
 
-`key` String or Function (required) - Name of the file on the cloud storage
+`key` String or Function (**required**) - Name of the file on the cloud storage
 service. If a function is provided, it will be called with `userId` in the
 context and its return value is used as the key.
 
@@ -272,16 +271,16 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `acl` String (optional)
 
-`AWSAccessKeyId` String (required for AWS S3) - Can also be set in
+`AWSAccessKeyId` String (**required** for AWS S3) - Can also be set in
 `Meteor.settings`
 
-`AWSSecretAccessKey` String (required for AWS S3) - Can also be set in
+`AWSSecretAccessKey` String (**required** for AWS S3) - Can also be set in
 `Meteor.settings`
 
-`GoogleAccessId` String (required for Google Cloud Storage) - Can also be set in
+`GoogleAccessId` String (**required** for Google Cloud Storage) - Can also be set in
 `Meteor.settings`
 
-`GoogleSecretKey` String (required for Google Cloud Storage) - Can also be set
+`GoogleSecretKey` String (**required** for Google Cloud Storage) - Can also be set
 in `Meteor.settings`
 
 ### File restrictions
