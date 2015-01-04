@@ -72,6 +72,36 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 This directive will not allow any files other than images to be uploaded. The
 policy is directed by the meteor app server and enforced by AWS S3.
 
+## Client side validation
+
+On both client and server side we declare file restrictions for our directive:
+
+```Javascript
+Slingshot.fileRestrictions("myFileUploads", {
+  allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
+  maxSize: 1*0x400*0x400, //1MB,
+  authorize: function() {
+    return this.userId
+  }
+});
+```
+
+Now Slingshot will validate the file before sending the authorization request to the server.
+
+
+### Manual validation
+```JavaScript
+var uploader = new Slingshot.Upload("myFileUploads");
+
+var error = uploader.validate(document.getElementById('input').files[0]);
+if (error) {
+  console.error(error);
+}
+```
+
+The validate method will return `null` if valid and returns an `Error instance` if validation fails.
+
+
 ## Storage services
 
 The client side is agnostic to which storage service is used. All it
@@ -213,27 +243,26 @@ Meteor core packages:
 
 ### Directives
 
-`authorize`: Function (required) - Function to determines if upload is allowed.
+`authorize`: Function (**required** unless set in File Restrictions)
 
-`maxSize`: Number (required) - Maximum file-size (in bytes). Use `null` or `0`
-for unlimited.
+`maxSize`: Number (**required** unless set in File Restrictions)
 
-`allowedFileTypes` RegExp, String or Array (required) - Allowed MIME types. Use
-null for any file type.
+`allowedFileTypes` RegExp, String or Array (**required** unless set in File
+Restrictions)
 
 `cacheControl` String (optional) - RFC 2616 Cache-Control directive
 
-`contentDisposition` String (required) - RFC 2616 Content-Disposition directive.
+`contentDisposition` String (**required**) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-`bucket` String (required) - Name of bucket to use. Google Cloud it default is
+`bucket` String (**required**) - Name of bucket to use. Google Cloud it default is
 `Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
 `Meteor.settings.S3Bucket`.
 
 `domain` String (optional) - Override domain to use to access bucket. Useful for
 CDN.
 
-`key` String or Function (required) - Name of the file on the cloud storage
+`key` String or Function (**required**) - Name of the file on the cloud storage
 service. If a function is provided, it will be called with `userId` in the
 context and its return value is used as the key.
 
@@ -242,14 +271,24 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `acl` String (optional)
 
-`AWSAccessKeyId` String (required for AWS S3) - Can also be set in
+`AWSAccessKeyId` String (**required** for AWS S3) - Can also be set in
 `Meteor.settings`
 
-`AWSSecretAccessKey` String (required for AWS S3) - Can also be set in
+`AWSSecretAccessKey` String (**required** for AWS S3) - Can also be set in
 `Meteor.settings`
 
-`GoogleAccessId` String (required for Google Cloud Storage) - Can also be set in
+`GoogleAccessId` String (**required** for Google Cloud Storage) - Can also be set in
 `Meteor.settings`
 
-`GoogleSecretKey` String (required for Google Cloud Storage) - Can also be set
+`GoogleSecretKey` String (**required** for Google Cloud Storage) - Can also be set
 in `Meteor.settings`
+
+### File restrictions
+
+`authorize`: Function (optional) - Function to determines if upload is allowed.
+
+`maxSize`: Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
+for unlimited.
+
+`allowedFileTypes` RegExp, String or Array (optional) - Allowed MIME types. Use
+null for any file type.

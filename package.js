@@ -11,7 +11,13 @@ Package.on_use(function (api) {
   api.use(["underscore", "check"]);
   api.use(["tracker", "reactive-var"], "client");
 
+  api.add_files([
+    "lib/restrictions.js",
+    "lib/validators.js"
+  ]);
+
   api.add_files("lib/upload.js", "client");
+
   api.add_files([
     "lib/directive.js",
     "lib/storage-policy.js",
