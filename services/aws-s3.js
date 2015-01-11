@@ -4,7 +4,6 @@ Slingshot.S3Storage = {
 
   secretKey: "AWSSecretAccessKey",
 
-
   directiveMatch: {
     bucket: String,
     bucketUrl: Match.OneOf(String, Function),
@@ -76,7 +75,7 @@ Slingshot.S3Storage = {
           "acl": directive.acl,
 
           "Cache-Control": directive.cacheControl,
-          "Content-Disposition": directive.contentDisposition ||
+          "Content-Disposition": directive.contentDisposition || file.name &&
             "inline; filename=" + quoteString(file.name, '"')
         },
 

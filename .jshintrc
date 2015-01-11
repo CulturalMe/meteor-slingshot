@@ -125,6 +125,7 @@
 
     //Internals
     "S3Policy": false,
-    "Slingshot": true
+    "Slingshot": true,
+    "matchAllowedFileTypes": false
   }
 }

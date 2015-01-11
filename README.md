@@ -48,7 +48,7 @@ On the server we declare a directive that controls upload access rules:
 Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
   bucket: "mybucket",
   allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
-
+  maxSize: 0,
   acl: "public-read",
 
   authorize: function () {
@@ -71,6 +71,36 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 
 This directive will not allow any files other than images to be uploaded. The
 policy is directed by the meteor app server and enforced by AWS S3.
+
+## Client side validation
+
+On both client and server side we declare file restrictions for our directive:
+
+```Javascript
+Slingshot.fileRestrictions("myFileUploads", {
+  allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
+  maxSize: 1*0x400*0x400, //1MB,
+  authorize: function() {
+    return this.userId
+  }
+});
+```
+
+Now Slingshot will validate the file before sending the authorization request to the server.
+
+
+### Manual validation
+```JavaScript
+var uploader = new Slingshot.Upload("myFileUploads");
+
+var error = uploader.validate(document.getElementById('input').files[0]);
+if (error) {
+  console.error(error);
+}
+```
+
+The validate method will return `null` if valid and returns an `Error instance` if validation fails.
+
 
 ## Storage services
 
@@ -101,7 +131,7 @@ Template.progressBar.helpers({
   progress: function () {
     return Math.round(this.uploader.progress() * 100);
   }
-}):
+});
 ```
 
 ## Show uploaded image before it is uploaded (latency compensation)
@@ -173,7 +203,7 @@ Save this file into the `/private` directory of your meteor app and add this
 line to your server-side code:
 
 ```JavaScript
-Slingshot.GoogleCloud.defaultDirective.GoogleSecretKey = Assets.getText('google-cloud-service-key.pem');
+Slingshot.GoogleCloud.directiveDefault.GoogleSecretKey = Assets.getText('google-cloud-service-key.pem');
 ```
 Declare Google Cloud Storage Directives as follows:
 
@@ -251,13 +281,12 @@ Meteor core packages:
 
 #### General
 
-`authorize`: Function (required) - Function to determines if upload is allowed.
+`authorize`: Function (**required** unless set in File Restrictions)
 
-`maxSize`: Number (required) - Maximum file-size (in bytes). Use `null` or `0`
-for unlimited.
+`maxSize`: Number (**required** unless set in File Restrictions)
 
-`allowedFileTypes` RegExp, String or Array (required) - Allowed MIME types. Use
-null for any file type. **Warning: This is not enforced on rackspace**
+`allowedFileTypes` RegExp, String or Array (**required** unless set in File
+Restrictions)
 
 `cdn` String (optional) - CDN domain for downloads.
 i.e. `"https://d111111abcdef8.cloudfront.net"`
@@ -267,7 +296,7 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 #### AWS S3 and Google Cloud
 
-`bucket` String (required) - Name of bucket to use.
+`bucket` String (**required**) - Name of bucket to use.
 For Google Cloud the default is `Meteor.settings.GoogleCloudBucket`. For AWS S3
 the default bucket is `Meteor.settings.S3Bucket`.
 
@@ -275,7 +304,7 @@ the default bucket is `Meteor.settings.S3Bucket`.
  uploaded. If it is a function, then the first argument is the bucket name. This
  url also used for downloads unless a cdn is given.
 
-`key` String or Function (required) - Name of the file on the cloud storage
+`key` String or Function (**required**) - Name of the file on the cloud storage
 service. If a function is provided, it will be called with `userId` in the
 context and its return value is used as the key. First argument is file info and
 the second is the meta-information that can be passed by the client.
@@ -284,35 +313,49 @@ the second is the meta-information that can be passed by the client.
 
 `cacheControl` String (optional) - RFC 2616 Cache-Control directive
 
-`contentDisposition` String (required) - RFC 2616 Content-Disposition directive.
+`contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
+
+`bucket` String (required) - Name of bucket to use. Google Cloud it default is
+`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
+`Meteor.settings.S3Bucket`.
 
 #### AWS S3 specific
 
-`AWSAccessKeyId` String (required) - Can also be set in `Meteor.settings`.
+`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
 `AWSSecretAccessKey` String (required) - Can also be set in `Meteor.settings`.
 
 #### Google Cloud Storage specific
 
-`GoogleAccessId` String (required) - Can also be set in `Meteor.settings`.
+`GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
 
-`GoogleSecretKey` String (required) - Can also be set in `Meteor.settings`.
+`GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
 
 #### Rackspace Cloud Files
 
-`container` String (required) - Name of container to use.
+`container` String (**required**) - Name of container to use.
 
 `region` String (optional) - The region used by your container. The default is
 `iad3`.
 
-`pathPrefix` String or Function (required) - Prefix or directory in which files
+`pathPrefix` String or Function (**required**) - Prefix or directory in which files
  are stored. The rest is taken from the uploaded file's name and cannot be
  enforced. If a function is provided, it will be called with `userId` in the
  context and its return value is used as the key. First argument is file info
  and the second is the meta-information that can be passed by the client.
 
-`RackspaceAccountId` String (required) - This is your rackspace account number.
+`RackspaceAccountId` String (**required**) - This is your rackspace account number.
 It can also be set set in `Meteor.settings`.
 
-`RackspaceSecretKey` String (required) - Can also be set in `Meteor.settings`.
+`RackspaceMetaDataKey` String (**required**) - Can also be set in `Meteor.settings`.
+
+### File restrictions
+
+`authorize`: Function (optional) - Function to determines if upload is allowed.
+
+`maxSize`: Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
+for unlimited.
+
+`allowedFileTypes` RegExp, String or Array (optional) - Allowed MIME types. Use
+null for any file type. **Warning: This is not enforced on rackspace**
