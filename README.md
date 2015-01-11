@@ -40,6 +40,17 @@ uploader.send(document.getElementById('input').files[0], function (error, downlo
 });
 ```
 
+### Client and Server
+
+These file upload restrictions are validated on the client and then appended to
+the directive on the server side to enforce them:
+
+```JavaScript
+Slingshot.fileRestrictions("myFileUploads", {
+  allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
+  maxSize: 10 * 1024 * 1024 // 10 MB (use null for unlimited)
+});
+```
 ### Server side
 
 On the server we declare a directive that controls upload access rules:
@@ -47,8 +58,7 @@ On the server we declare a directive that controls upload access rules:
 ```JavaScript
 Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
   bucket: "mybucket",
-  allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
-  maxSize: 0,
+
   acl: "public-read",
 
   authorize: function () {
@@ -69,50 +79,23 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 });
 ```
 
-This directive will not allow any files other than images to be uploaded. The
+With the directive above, no other files than images will be allowed. The
 policy is directed by the meteor app server and enforced by AWS S3.
-
-## Client side validation
-
-On both client and server side we declare file restrictions for our directive:
-
-```Javascript
-Slingshot.fileRestrictions("myFileUploads", {
-  allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
-  maxSize: 1*0x400*0x400, //1MB,
-  authorize: function() {
-    return this.userId
-  }
-});
-```
-
-Now Slingshot will validate the file before sending the authorization request to the server.
-
-
-### Manual validation
-```JavaScript
-var uploader = new Slingshot.Upload("myFileUploads");
-
-var error = uploader.validate(document.getElementById('input').files[0]);
-if (error) {
-  console.error(error);
-}
-```
-
-The validate method will return `null` if valid and returns an `Error instance` if validation fails.
-
 
 ## Storage services
 
 The client side is agnostic to which storage service is used. All it
-needs, is a directive name.
+needs for the file upload to work, is a directive name.
 
 There is no limit imposed on how many directives can be declared for each
 storage service.
 
+Storage services are pluggable in Slingshot and you can add support for own
+storage service as described in a section below.
+
 ## Progress bars
 
-For progress bars of the upload use:
+You can create file upload progress bars as follows:
 
 ```handlebars
 <template name="progressBar">
@@ -134,7 +117,7 @@ Template.progressBar.helpers({
 });
 ```
 
-## Show uploaded image before it is uploaded (latency compensation)
+## Show uploaded file before it is uploaded (latency compensation)
 
 ```handlebars
 <template name="myPicture">
@@ -145,16 +128,70 @@ Template.progressBar.helpers({
 ```JavaScript
 Template.myPicture.helpers({
   url: function () {
-    //pass true to download the image into cache (preload) before using it.
+    //if we are uploading an image, pass true to download the image into cache
+    //this will preload the image before using the remote image url.
     return this.uploader.url(true);
   }
 });
 ```
 
-This will use [Blob URLs](http://caniuse.com/#feat=bloburls) to show the image
-from the local source until it is uploaded to the server. If Blob URL's are not
-available it will attempt to use `FileReader` to generate a base64-encoded url
-representing the data as a fallback.
+This to show the image from the local source until it is uploaded to the server.
+If Blob URL's are not available it will attempt to use `FileReader` to generate
+a base64-encoded url representing the data as a fallback.
+
+## Add meta-context to your uploads
+
+You can add meta-context to your file-uploads, to make your requests more
+specific on where the files are to be uploaded.
+
+Consider the following example...
+
+We have an app that features picture albums. An album belongs to a user and
+only that user is allowed to upload picture to it. In the cloud each album has
+its own directory where its pictures are stored.
+
+We declare our client-side uploader as follows:
+
+```JavaScript
+var metaContext = {albumId: album._id}
+var uploadToMyAlbum = new Slingshot.Upload("picturealbum", metaContext);
+```
+
+On the server side the directive can now set the key accordingly and check if
+the user is allowed post pictures to the given album:
+
+```JavaScript
+Slingshot.createDirective("picturealbum", Slingshot.GoogleCloud, {
+  acl: "public-read",
+
+  authorize: function (file, metaContext) {
+    var album = Albums.findOne(metaContext.albumId);
+
+    //Denied if album doesn't exist or if it is not owned by the current user.
+    return album && album.userId === this.userId;
+  },
+
+  key: function (file, metaContext) {
+    return metaContext.albumId + "/" + Date.now() + "-" + file.name;
+  }
+});
+```
+## Manual Client Side  validation
+
+You can check if a file uploadable according to file-restrictions as follows:
+
+```JavaScript
+var uploader = new Slingshot.Upload("myFileUploads");
+
+var error = uploader.validate(document.getElementById('input').files[0]);
+if (error) {
+  console.error(error);
+}
+```
+
+The validate method will return `null` if valid and returns an `Error` instance
+if validation fails.
+
 
 ### AWS S3
 
@@ -233,6 +270,105 @@ sent to along with the file AWS S3 or Google Cloud Storage. This policy is
 signed by the secret key and contains all the restrictions that you define in
 the directive. By default a signed policy expires after 5 minutes.
 
+## Adding Support for other storage Services
+
+Cloud storage services are pluggable in Slingshot. You can add support for a
+cloud storage service of your choice. All you need is to declare an object
+with the following parameters:
+
+```JavaScript
+MyStorageService = {
+
+  /**
+   * Define the additional parameters that your your service uses here.
+   *
+   * Note that some parameters like maxSize are shared by all services. You do
+   * not need to define those by yourself.
+   */
+
+
+  directiveMatch: {
+    accessKey: String,
+
+    options: Object,
+
+    foo: Match.Optional(Function)
+  },
+
+  /**
+   * Here you can set default parameters that your service will use
+   */
+
+  directiveDefault: {
+    options: {}
+  },
+
+
+  /**
+   *
+   * @param {Object} method - This is the Meteor Method context.
+   * @param {Object} directive - All the parameters from the directive.
+   * @param {Object} file - Information about the file as gathered by the
+   * browser
+   * @param {Object} [meta] - Meta data that was passed to the uploader.
+   *
+   * @returns {UploadInstructions}
+   */
+
+  upload: function (method, directive, file, meta) {
+    var accessKey = directive.accessKey;
+
+    var fooData = directive.foo && directive.foo.call(method, file, meta);
+
+    //Here you need to make sure that all parameters passed in the directive
+    //are going to be enforced by the server receiving the file.
+
+    return {
+      // Endpoint where the file is to be uploaded:
+      upload: "https://example.com",
+
+      // Download URL, once the file uploaded:
+      download: directive.cdn || "https://example.com/" + file.name,
+
+      // POST data to be attached to the file-upload:
+      postData: [
+        {
+          name: "accessKey",
+          value: accessKey
+        },
+        {
+          name: "signature",
+          value: signature
+        }
+        //...
+      ],
+
+      // HTTP headers to send when uploading:
+      headers: {
+        "x-foo-bar": fooData
+      }
+    };
+  },
+
+  /**
+   * Absolute maximum file-size allowable by the storage service.
+   */
+
+  maxSize: 5 * 1024 * 1024 * 1024
+};
+```
+
+Example Directive:
+
+```JavaScript
+Slingshot.createDirective("myUploads", MyStorageService, {
+  accessKey: "a12345xyz",
+  foo: function (file, metaContext) {
+    return "bar";
+  }
+});
+```
+
 ## Dependencies
 
 Meteor core packages:
@@ -246,7 +382,7 @@ Meteor core packages:
 
 ### Directives
 
-#### General
+#### General (All Services)
 
 `authorize`: Function (**required** unless set in File Restrictions)
 
@@ -261,11 +397,28 @@ i.e. `"https://d111111abcdef8.cloudfront.net"`
 `expire` Number (optional) - Number of milliseconds in which an upload
 authorization will expire after the request was made. Default is 5 minutes.
 
-#### AWS S3 and Google Cloud
+#### AWS S3 specific
 
-`bucket` String (**required**) - Name of bucket to use.
-For Google Cloud the default is `Meteor.settings.GoogleCloudBucket`. For AWS S3
-the default bucket is `Meteor.settings.S3Bucket`.
+`bucket` String (**required**) - Name of bucket to use. The default is
+`Meteor.settings.S3Bucket`.
+
+`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
+"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
+
+`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
+
+`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
+
+#### Google Cloud Storage specific
+
+`bucket` String (**required**) - Name of bucket to use. The default is
+`Meteor.settings.GoogleCloudBucket`.
+
+`GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
+
+`GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
+
+#### AWS S3 and Google Cloud
 
 `bucketUrl` String or Function (optional) - Override URL to which files are
  uploaded. If it is a function, then the first argument is the bucket name. This
@@ -292,9 +445,6 @@ Default is the uploaded file's name (inline). Use null to disable.
 `AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
 `AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
-
-`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
-"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
 
 #### Google Cloud Storage specific
 
