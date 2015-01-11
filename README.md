@@ -213,40 +213,6 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
 });
 ```
 
-### Rackspace Cloud Files
-
-You will need a`RackspaceAccountId` (your acocunt number) and
-`RackspaceMetaDataKey` in `Meteor.settings`.
-
-In order to obtain your `RackspaceMetaDataKey` you need an
-[auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
-and then follow the
-[instructions here](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Set_Account_Metadata-d1a666.html).
-
-For your container you need container and provide its name and region.
-
-```JavaScript
-Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFiles, {
-  container: "myContainer", //Container name
-  region: "lon3", //Region code (The default would be 'iad3')
-
-  pathPrefix: function (file) {
-    //Store file into a directory by the user's username.
-    var user = Meteor.users.findOne(this.userId);
-    return user.username;
-  }
-});
-```
-
-To setup CORS you also need to your Auth-Token from above and use:
-
-```bash
-curl -I -X HEAD -H 'X-Auth-Token: yourAuthToken' \
-  -H 'X-Container-Meta-Access-Control-Allow-Origin: *' \
-  -H 'X-Container-Meta-Access-Expose-Headers: etag location x-timestamp x-trans-id Access-Control-Allow-Origin' \
-  https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
-```
-
 ## Browser Compatibility
 
 Currently the uploader uses `XMLHttpRequest 2` to upload the files, which is not
@@ -333,24 +299,6 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 `GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-#### Rackspace Cloud Files
-
-`container` String (**required**) - Name of container to use.
-
-`region` String (optional) - The region used by your container. The default is
-`iad3`.
-
-`pathPrefix` String or Function (**required**) - Prefix or directory in which files
- are stored. The rest is taken from the uploaded file's name and cannot be
- enforced. If a function is provided, it will be called with `userId` in the
- context and its return value is used as the key. First argument is file info
- and the second is the meta-information that can be passed by the client.
-
-`RackspaceAccountId` String (**required**) - This is your rackspace account number.
-It can also be set set in `Meteor.settings`.
-
-`RackspaceMetaDataKey` String (**required**) - Can also be set in `Meteor.settings`.
-
 ### File restrictions
 
 `authorize`: Function (optional) - Function to determines if upload is allowed.
@@ -359,4 +307,4 @@ It can also be set set in `Meteor.settings`.
 for unlimited.
 
 `allowedFileTypes` RegExp, String or Array (optional) - Allowed MIME types. Use
-null for any file type. **Warning: This is not enforced on rackspace**
+null for any file type.
