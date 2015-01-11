@@ -226,9 +226,9 @@ and then follow the
 For your container you need container and provide its name and region.
 
 ```JavaScript
-Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFIles, {
+Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFiles, {
   container: "myContainer", //Container name
-  region: "lon3", //Region code. The default is 'iad3'
+  region: "lon3", //Region code (The default would be 'iad3')
 
   pathPrefix: function (file) {
     //Store file into a directory by the user's username.
@@ -238,11 +238,12 @@ Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFIles, {
 });
 ```
 
-To setup CORS use:
+To setup CORS you also need to your Auth-Token from above and use:
 
 ```bash
 curl -I -X HEAD -H 'X-Auth-Token: yourAuthToken' \
   -H 'X-Container-Meta-Access-Control-Allow-Origin: *' \
+  -H 'X-Container-Meta-Access-Expose-Headers: etag location x-timestamp x-trans-id Access-Control-Allow-Origin' \
   https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
 ```
 
@@ -316,7 +317,7 @@ the second is the meta-information that can be passed by the client.
 `contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-`bucket` String (required) - Name of bucket to use. Google Cloud it default is
+`bucket` String (**required**) - Name of bucket to use. Google Cloud it default is
 `Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
 `Meteor.settings.S3Bucket`.
 
@@ -324,7 +325,7 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 `AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
-`AWSSecretAccessKey` String (required) - Can also be set in `Meteor.settings`.
+`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
 #### Google Cloud Storage specific
 
