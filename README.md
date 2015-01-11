@@ -218,17 +218,26 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
 You will need a`RackspaceAccountId` (your acocunt number) and
 `RackspaceMetaDataKey` in `Meteor.settings`.
 
-In order to obtain your `RackspaceMetaDataKey` you need an
+In order to obtain your `RackspaceMetaDataKey` (a.k.a. Account-Meta-Temp-Url-Key)
+you need an
 [auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
 and then follow the
 [instructions here](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Set_Account_Metadata-d1a666.html).
 
-For your container you need container and provide its name and region.
+Note that API-Key, Auth-Token, Meta-Data-Key are not the same thing:
+
+API-Key is what you need to obtain an Auth-Token, which in turn is what you need
+to setup CORS and to set your Meta-Data-Key. The auth-token expires after 24 hours.
+
+For your directive you need container and provide its name, region and cdn.
 
 ```JavaScript
 Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFiles, {
   container: "myContainer", //Container name
   region: "lon3", //Region code (The default would be 'iad3')
+
+  //You must set the cdn if you want the files to be publicly accessible:
+  cdn: "https://abcdefghije8c9d17810-ef6d926c15e2b87b22e15225c32e2e17.r19.cf5.rackcdn.com",
 
   pathPrefix: function (file) {
     //Store file into a directory by the user's username.
