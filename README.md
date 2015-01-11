@@ -287,7 +287,7 @@ Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFiles, {
 To setup CORS you also need to your Auth-Token from above and use:
 
 ```bash
-curl -I -X HEAD -H 'X-Auth-Token: yourAuthToken' \
+curl -I -X POST -H 'X-Auth-Token: yourAuthToken' \
   -H 'X-Container-Meta-Access-Control-Allow-Origin: *' \
   -H 'X-Container-Meta-Access-Expose-Headers: etag location x-timestamp x-trans-id Access-Control-Allow-Origin' \
   https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
