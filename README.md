@@ -293,6 +293,9 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 `AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
+`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
+"us-east-1".
+
 #### Google Cloud Storage specific
 
 `GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
@@ -301,9 +304,9 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 ### File restrictions
 
-`authorize`: Function (optional) - Function to determines if upload is allowed.
+`authorize` Function (optional) - Function to determines if upload is allowed.
 
-`maxSize`: Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
+`maxSize` Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
 for unlimited.
 
 `allowedFileTypes` RegExp, String or Array (optional) - Allowed MIME types. Use
