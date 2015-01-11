@@ -151,7 +151,10 @@ Template.myPicture.helpers({
 });
 ```
 
-This will use [Blob URLs](http://caniuse.com/#feat=bloburls) to show the image from the local source until it is uploaded to the server. If Blob URL's are not available it will attempt to use `FileReader` to generate a base64 encoded url representing the data as a fallback.
+This will use [Blob URLs](http://caniuse.com/#feat=bloburls) to show the image
+from the local source until it is uploaded to the server. If Blob URL's are not
+available it will attempt to use `FileReader` to generate a base64-encoded url
+representing the data as a fallback.
 
 ### AWS S3
 
@@ -243,6 +246,8 @@ Meteor core packages:
 
 ### Directives
 
+#### General
+
 `authorize`: Function (**required** unless set in File Restrictions)
 
 `maxSize`: Number (**required** unless set in File Restrictions)
@@ -250,38 +255,49 @@ Meteor core packages:
 `allowedFileTypes` RegExp, String or Array (**required** unless set in File
 Restrictions)
 
+`cdn` String (optional) - CDN domain for downloads.
+i.e. `"https://d111111abcdef8.cloudfront.net"`
+
+`expire` Number (optional) - Number of milliseconds in which an upload
+authorization will expire after the request was made. Default is 5 minutes.
+
+#### AWS S3 and Google Cloud
+
+`bucket` String (**required**) - Name of bucket to use.
+For Google Cloud the default is `Meteor.settings.GoogleCloudBucket`. For AWS S3
+the default bucket is `Meteor.settings.S3Bucket`.
+
+`bucketUrl` String or Function (optional) - Override URL to which files are
+ uploaded. If it is a function, then the first argument is the bucket name. This
+ url also used for downloads unless a cdn is given.
+
+`key` String or Function (**required**) - Name of the file on the cloud storage
+service. If a function is provided, it will be called with `userId` in the
+context and its return value is used as the key. First argument is file info and
+the second is the meta-information that can be passed by the client.
+
+`acl` String (optional)
+
 `cacheControl` String (optional) - RFC 2616 Cache-Control directive
 
-`contentDisposition` String (**required**) - RFC 2616 Content-Disposition directive.
+`contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
 `bucket` String (**required**) - Name of bucket to use. Google Cloud it default is
 `Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
 `Meteor.settings.S3Bucket`.
 
-`domain` String (optional) - Override domain to use to access bucket. Useful for
-CDN.
+#### AWS S3 specific
 
-`key` String or Function (**required**) - Name of the file on the cloud storage
-service. If a function is provided, it will be called with `userId` in the
-context and its return value is used as the key.
+`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
-`expire` Number (optional) - Number of milliseconds in which an upload
-authorization will expire after the request was made. Default is 5 minutes.
+`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-`acl` String (optional)
+#### Google Cloud Storage specific
 
-`AWSAccessKeyId` String (**required** for AWS S3) - Can also be set in
-`Meteor.settings`
+`GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
 
-`AWSSecretAccessKey` String (**required** for AWS S3) - Can also be set in
-`Meteor.settings`
-
-`GoogleAccessId` String (**required** for Google Cloud Storage) - Can also be set in
-`Meteor.settings`
-
-`GoogleSecretKey` String (**required** for Google Cloud Storage) - Can also be set
-in `Meteor.settings`
+`GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
 
 ### File restrictions
 
