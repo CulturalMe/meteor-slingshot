@@ -294,7 +294,7 @@ Default is the uploaded file's name (inline). Use null to disable.
 `AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
 `region` String (optional) - Default is `Meteor.settings.AWSRegion` or
-"us-east-1".
+"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
 
 #### Google Cloud Storage specific
 
