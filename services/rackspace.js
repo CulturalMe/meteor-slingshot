@@ -25,19 +25,23 @@ Slingshot.RackspaceFiles = {
 
   version: "v1",
 
-  path: function (method, directive, file, meta) {
-    var path = [
+  path: function (directive, prefix) {
+    return "/" + [
       this.version,
       "MossoCloudFS_" + directive.RackspaceAccountId,
-      directive.container
-    ];
+      directive.container,
+      prefix
+    ].join("/").replace(/\/+/, "/");
+  },
 
+  pathPrefix: function (method, directive, file, meta) {
     if ("pathPrefix" in directive) {
-      path.push(_.isFunction(directive.pathPrefix) ?
+      return (_.isFunction(directive.pathPrefix) ?
         directive.pathPrefix.call(method, file, meta) : directive.pathPrefix);
     }
-
-    return ("/" + path.join("/")).replace(/\/+/, "/");
+    else {
+      return "";
+    }
   },
 
   host: function (region) {
@@ -47,7 +51,8 @@ Slingshot.RackspaceFiles = {
   maxSize: 0x140000000, //5GB
 
   upload: function (method, directive, file, meta) {
-    var path = this.path(method, directive, file, meta),
+    var pathPrefix = this.pathPrefix(method, directive, file, meta),
+        path = this.path(directive, pathPrefix),
         host = this.host(directive.region),
         url = host + path,
         data = [
@@ -86,9 +91,11 @@ Slingshot.RackspaceFiles = {
         value: Math.round(directive.deleteAfter / 1000)
       });
 
+    var cdn = directive.cdn;
+
     return {
       upload: url,
-      download: (directive.cdn || host) + path + "/" + file.name,
+      download: (cdn && cdn + "/" + pathPrefix || host + path) + file.name,
       postData: data
     };
   },
