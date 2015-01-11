@@ -42,11 +42,15 @@ uploader.send(document.getElementById('input').files[0], function (error, downlo
 
 ### Client and Server
 
+These file upload restrictions are validated on the client and then appended to
+the directive on the server side to enforce them:
+
+```JavaScript
 Slingshot.fileRestrictions("myFileUploads", {
   allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
-  maxSize: 10 * 1024 * 1024 // 10 MB (use 0 for unlimited)
+  maxSize: 10 * 1024 * 1024 // 10 MB (use null for unlimited)
 });
-
+```
 ### Server side
 
 On the server we declare a directive that controls upload access rules:
@@ -75,22 +79,8 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 });
 ```
 
-With the directive above, no other files than image will be allowed. The
+With the directive above, no other files than images will be allowed. The
 policy is directed by the meteor app server and enforced by AWS S3.
-
-### Manual validation
-
-```JavaScript
-var uploader = new Slingshot.Upload("myFileUploads");
-
-var error = uploader.validate(document.getElementById('input').files[0]);
-if (error) {
-  console.error(error);
-}
-```
-
-The validate method will return `null` if valid and returns an `Error` instance
-if validation fails.
 
 ## Storage services
 
@@ -186,6 +176,22 @@ Slingshot.createDirective("picturealbum", Slingshot.GoogleCloud, {
   }
 });
 ```
+## Manual Client Side  validation
+
+You can check if a file uploadable according to file-restrictions as follows:
+
+```JavaScript
+var uploader = new Slingshot.Upload("myFileUploads");
+
+var error = uploader.validate(document.getElementById('input').files[0]);
+if (error) {
+  console.error(error);
+}
+```
+
+The validate method will return `null` if valid and returns an `Error` instance
+if validation fails.
+
 
 ### AWS S3
 
