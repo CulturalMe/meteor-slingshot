@@ -269,7 +269,7 @@ to setup CORS and to set your Meta-Data-Key. The auth-token expires after 24 hou
 For your directive you need container and provide its name, region and cdn.
 
 ```JavaScript
-Slingshot.createDirective("google-cloud-example", Slingshot.RackspaceFiles, {
+Slingshot.createDirective("rackspace-files-example", Slingshot.RackspaceFiles, {
   container: "myContainer", //Container name
   region: "lon3", //Region code (The default would be 'iad3')
 
