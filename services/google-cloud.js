@@ -6,7 +6,7 @@ Slingshot.GoogleCloud = _.defaults({
   secretKey: "GoogleSecretKey",
 
   directiveMatch: _.chain(Slingshot.S3Storage.directiveMatch)
-    .omit(Slingshot.S3Storage.accessId, Slingshot.S3Storage.secretKey)
+    .omit(Slingshot.S3Storage.accessId, Slingshot.S3Storage.secretKey, "region")
     .extend({
       GoogleAccessId: String,
       GoogleSecretKey: String,
@@ -34,8 +34,14 @@ Slingshot.GoogleCloud = _.defaults({
         return "https://" + bucket + ".storage.googleapis.com";
       }
     })
-    .omit(Slingshot.S3Storage.accessId, Slingshot.S3Storage.secretKey)
+    .omit(Slingshot.S3Storage.accessId, Slingshot.S3Storage.secretKey, "region")
     .value(),
+
+  applySignature: function (payload, policy, directive) {
+    payload[this.accessId] = directive[this.accessId];
+    payload.policy = policy.match(_.omit(payload, this.accessId)).stringify();
+    payload.signature = this.sign(directive[this.secretKey], payload.policy);
+  },
 
   /**
    * @param {String} secretKey - pem private key

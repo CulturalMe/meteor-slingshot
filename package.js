@@ -27,3 +27,8 @@ Package.on_use(function (api) {
 
   api.export("Slingshot");
 });
+
+Package.on_test(function (api) {
+  api.use(["tinytest", "underscore", "edgee:slingshot"]);
+  api.add_files("test/aws-s3.js", "server");
+});

@@ -402,6 +402,9 @@ authorization will expire after the request was made. Default is 5 minutes.
 `bucket` String (**required**) - Name of bucket to use. The default is
 `Meteor.settings.S3Bucket`.
 
+`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
+"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
+
 `AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
 `AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
@@ -433,11 +436,27 @@ the second is the meta-information that can be passed by the client.
 `contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
+`bucket` String (**required**) - Name of bucket to use. Google Cloud it default is
+`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
+`Meteor.settings.S3Bucket`.
+
+#### AWS S3 specific
+
+`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
+
+`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
+
+#### Google Cloud Storage specific
+
+`GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
+
+`GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
+
 ### File restrictions
 
-`authorize`: Function (optional) - Function to determines if upload is allowed.
+`authorize` Function (optional) - Function to determines if upload is allowed.
 
-`maxSize`: Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
+`maxSize` Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
 for unlimited.
 
 `allowedFileTypes` RegExp, String or Array (optional) - Allowed MIME types. Use
