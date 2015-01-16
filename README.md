@@ -250,6 +250,49 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
 });
 ```
 
+### Rackspace Cloud Files
+
+You will need a`RackspaceAccountId` (your acocunt number) and
+`RackspaceMetaDataKey` in `Meteor.settings`.
+
+In order to obtain your `RackspaceMetaDataKey` (a.k.a. Account-Meta-Temp-Url-Key)
+you need an
+[auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
+and then follow the
+[instructions here](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Set_Account_Metadata-d1a666.html).
+
+Note that API-Key, Auth-Token, Meta-Data-Key are not the same thing:
+
+API-Key is what you need to obtain an Auth-Token, which in turn is what you need
+to setup CORS and to set your Meta-Data-Key. The auth-token expires after 24 hours.
+
+For your directive you need container and provide its name, region and cdn.
+
+```JavaScript
+Slingshot.createDirective("rackspace-files-example", Slingshot.RackspaceFiles, {
+  container: "myContainer", //Container name
+  region: "lon3", //Region code (The default would be 'iad3')
+
+  //You must set the cdn if you want the files to be publicly accessible:
+  cdn: "https://abcdefghije8c9d17810-ef6d926c15e2b87b22e15225c32e2e17.r19.cf5.rackcdn.com",
+
+  pathPrefix: function (file) {
+    //Store file into a directory by the user's username.
+    var user = Meteor.users.findOne(this.userId);
+    return user.username;
+  }
+});
+```
+
+To setup CORS you also need to your Auth-Token from above and use:
+
+```bash
+curl -I -X POST -H 'X-Auth-Token: yourAuthToken' \
+  -H 'X-Container-Meta-Access-Control-Allow-Origin: *' \
+  -H 'X-Container-Meta-Access-Expose-Headers: etag location x-timestamp x-trans-id Access-Control-Allow-Origin' \
+  https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
+```
+
 ## Browser Compatibility
 
 Currently the uploader uses `XMLHttpRequest 2` to upload the files, which is not
