@@ -1,6 +1,14 @@
 Slingshot Changelog
 ===================
 
+## Version 0.4.0
+
+### New Features and Enhancements
+
+ * Added region parameters to S3. The default is `us-east-1`. This fixes bucketUrl problems [#33](https://github.com/CulturalMe/meteor-slingshot/issues/33).
+ * Upgrade to `AWS4-HMAC-256` for S3 policy signing to make slingshot compatible with new AWS datacenters, such as Frankfurt. [#33](https://github.com/CulturalMe/meteor-slingshot/issues/33)
+ * Added Rackspace Cloud Files support [#17](https://github.com/CulturalMe/meteor-slingshot/issues/17).
+
 ## Version 0.3.0
 
 ### New Features and Enhancements
