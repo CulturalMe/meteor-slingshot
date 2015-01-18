@@ -440,7 +440,7 @@ i.e. `"https://d111111abcdef8.cloudfront.net"`
 `expire` Number (optional) - Number of milliseconds in which an upload
 authorization will expire after the request was made. Default is 5 minutes.
 
-#### AWS S3 specific
+#### AWS S3
 
 `bucket` String (**required**) - Name of bucket to use. The default is
 `Meteor.settings.S3Bucket`.
@@ -452,7 +452,7 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-#### Google Cloud Storage specific
+#### Google Cloud Storage
 
 `bucket` String (**required**) - Name of bucket to use. The default is
 `Meteor.settings.GoogleCloudBucket`.
@@ -461,7 +461,11 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-#### AWS S3 and Google Cloud
+#### AWS S3 and Google Cloud Storage
+
+`bucket` String (**required**) - Name of bucket to use. The default is
+`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
+`Meteor.settings.S3Bucket`.
 
 `bucketUrl` String or Function (optional) - Override URL to which files are
  uploaded. If it is a function, then the first argument is the bucket name. This
@@ -479,21 +483,21 @@ the second is the meta-information that can be passed by the client.
 `contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-`bucket` String (**required**) - Name of bucket to use. Google Cloud it default is
-`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
-`Meteor.settings.S3Bucket`.
+#### Rackspace Cloud
 
-#### AWS S3 specific
+`RackspaceAccountId` String (**required**) - Can also be set in `Meteor.settings`.
 
-`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
+`RackspaceMetaDataKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
+`container` String (**required**) - Name of container to use.
 
-#### Google Cloud Storage specific
+`region` String (optional) - Data Center region. The default is `"iad3"`. [See other regions](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Service-Access-Endpoints-d1e003.html)
 
-`GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
+`pathPrefix` String or Function (**required**) - Simlar to `key` for S3, but will always be appended by `file.name` that is provided by the client.
 
-`GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
+`deleteAt` Date (optional) - Absolute time when the uploaded file is to be deleted. _This attribute is not enforced at all. It can be easily altered by the client_
+
+`deleteAfter` Number (optional) - Same as `deleteAt`, but relative.
 
 ### File restrictions
 
