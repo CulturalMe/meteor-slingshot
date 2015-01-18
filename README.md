@@ -250,6 +250,49 @@ Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
 });
 ```
 
+### Rackspace Cloud Files
+
+You will need a`RackspaceAccountId` (your acocunt number) and
+`RackspaceMetaDataKey` in `Meteor.settings`.
+
+In order to obtain your `RackspaceMetaDataKey` (a.k.a. Account-Meta-Temp-Url-Key)
+you need an
+[auth-token](http://docs.rackspace.com/loadbalancers/api/v1.0/clb-getting-started/content/Generating_Auth_Token.html)
+and then follow the
+[instructions here](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Set_Account_Metadata-d1a666.html).
+
+Note that API-Key, Auth-Token, Meta-Data-Key are not the same thing:
+
+API-Key is what you need to obtain an Auth-Token, which in turn is what you need
+to setup CORS and to set your Meta-Data-Key. The auth-token expires after 24 hours.
+
+For your directive you need container and provide its name, region and cdn.
+
+```JavaScript
+Slingshot.createDirective("rackspace-files-example", Slingshot.RackspaceFiles, {
+  container: "myContainer", //Container name
+  region: "lon3", //Region code (The default would be 'iad3')
+
+  //You must set the cdn if you want the files to be publicly accessible:
+  cdn: "https://abcdefghije8c9d17810-ef6d926c15e2b87b22e15225c32e2e17.r19.cf5.rackcdn.com",
+
+  pathPrefix: function (file) {
+    //Store file into a directory by the user's username.
+    var user = Meteor.users.findOne(this.userId);
+    return user.username;
+  }
+});
+```
+
+To setup CORS you also need to your Auth-Token from above and use:
+
+```bash
+curl -I -X POST -H 'X-Auth-Token: yourAuthToken' \
+  -H 'X-Container-Meta-Access-Control-Allow-Origin: *' \
+  -H 'X-Container-Meta-Access-Expose-Headers: etag location x-timestamp x-trans-id Access-Control-Allow-Origin' \
+  https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
+```
+
 ## Browser Compatibility
 
 Currently the uploader uses `XMLHttpRequest 2` to upload the files, which is not
@@ -397,16 +440,19 @@ i.e. `"https://d111111abcdef8.cloudfront.net"`
 `expire` Number (optional) - Number of milliseconds in which an upload
 authorization will expire after the request was made. Default is 5 minutes.
 
-#### AWS S3 specific
+#### AWS S3
 
 `bucket` String (**required**) - Name of bucket to use. The default is
 `Meteor.settings.S3Bucket`.
+
+`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
+"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
 
 `AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
 `AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-#### Google Cloud Storage specific
+#### Google Cloud Storage
 
 `bucket` String (**required**) - Name of bucket to use. The default is
 `Meteor.settings.GoogleCloudBucket`.
@@ -415,7 +461,11 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-#### AWS S3 and Google Cloud
+#### AWS S3 and Google Cloud Storage
+
+`bucket` String (**required**) - Name of bucket to use. The default is
+`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
+`Meteor.settings.S3Bucket`.
 
 `bucketUrl` String or Function (optional) - Override URL to which files are
  uploaded. If it is a function, then the first argument is the bucket name. This
@@ -433,11 +483,27 @@ the second is the meta-information that can be passed by the client.
 `contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
+#### Rackspace Cloud
+
+`RackspaceAccountId` String (**required**) - Can also be set in `Meteor.settings`.
+
+`RackspaceMetaDataKey` String (**required**) - Can also be set in `Meteor.settings`.
+
+`container` String (**required**) - Name of container to use.
+
+`region` String (optional) - Data Center region. The default is `"iad3"`. [See other regions](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Service-Access-Endpoints-d1e003.html)
+
+`pathPrefix` String or Function (**required**) - Simlar to `key` for S3, but will always be appended by `file.name` that is provided by the client.
+
+`deleteAt` Date (optional) - Absolute time when the uploaded file is to be deleted. _This attribute is not enforced at all. It can be easily altered by the client_
+
+`deleteAfter` Number (optional) - Same as `deleteAt`, but relative.
+
 ### File restrictions
 
-`authorize`: Function (optional) - Function to determines if upload is allowed.
+`authorize` Function (optional) - Function to determines if upload is allowed.
 
-`maxSize`: Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
+`maxSize` Number (optional) - Maximum file-size (in bytes). Use `null` or `0`
 for unlimited.
 
 `allowedFileTypes` RegExp, String or Array (optional) - Allowed MIME types. Use
