@@ -8,6 +8,9 @@ Slingshot Changelog
  * Added region parameters to S3. The default is `us-east-1`. This fixes bucketUrl problems [#33](https://github.com/CulturalMe/meteor-slingshot/issues/33).
  * Upgrade to `AWS4-HMAC-256` for S3 policy signing to make slingshot compatible with new AWS datacenters, such as Frankfurt. [#33](https://github.com/CulturalMe/meteor-slingshot/issues/33)
  * Added Rackspace Cloud Files support [#17](https://github.com/CulturalMe/meteor-slingshot/issues/17).
+ * Added dependency to the core HTTP package on the server side.
+ * Added resumable upload support for Google Cloud Storage.
+ * Upload instructions returned by upload services now must include an upload method (`PUT` or `POST`)
 
 ## Version 0.3.0
 

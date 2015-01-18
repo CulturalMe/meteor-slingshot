@@ -50,9 +50,7 @@ Slingshot.GoogleCloud = _.defaults({
    */
 
   sign: function (secretKey, policy) {
-    return Npm.require("crypto")
-      .createSign('RSA-SHA256')
-      .update(policy)
-      .sign(secretKey, "base64");
+    /* global rsaSha256: false*/
+    return rsaSha256(policy, secretKey);
   }
 }, Slingshot.S3Storage);

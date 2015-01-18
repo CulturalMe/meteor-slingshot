@@ -420,6 +420,7 @@ Meteor core packages:
  * tracker
  * reactive-var
  * check
+ * http
 
 ## API Reference
 

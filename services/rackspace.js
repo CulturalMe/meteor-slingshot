@@ -96,7 +96,8 @@ Slingshot.RackspaceFiles = {
     return {
       upload: url,
       download: (cdn && cdn + "/" + pathPrefix || host + path) + file.name,
-      postData: data
+      postData: data,
+      method: "POST"
     };
   },
 

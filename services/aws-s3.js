@@ -65,39 +65,16 @@ Slingshot.S3Storage = {
    */
 
   upload: function (method, directive, file, meta) {
-    var url = Npm.require("url"),
-
-        policy = new Slingshot.StoragePolicy()
-          .expireIn(directive.expire)
-          .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
-
-        payload = {
-          key: _.isFunction(directive.key) ?
-            directive.key.call(method, file, meta) : directive.key,
-
-          bucket: directive.bucket,
-
-          "Content-Type": file.type,
-          "acl": directive.acl,
-
-          "Cache-Control": directive.cacheControl,
-          "Content-Disposition": directive.contentDisposition || file.name &&
-            "inline; filename=" + quoteString(file.name, '"')
-        },
-
-        bucketUrl = _.isFunction(directive.bucketUrl) ?
-          directive.bucketUrl(directive.bucket, directive.region) :
-          directive.bucketUrl,
-
-        download = _.extend(url.parse(directive.cdn || bucketUrl), {
-          pathname: payload.key
-        });
+    var policy = this.createPolicy(directive, file),
+        payload = this.getPayload(method, directive, file, meta),
+        bucketUrl = this.bucketUrl(directive),
+        download = this.downloadUrl(directive, payload.key);
 
     this.applySignature(payload, policy, directive);
 
     return {
       upload: bucketUrl,
-      download: url.format(download),
+      download: download,
       postData: [{
         name: "key",
         value: payload.key
@@ -106,8 +83,54 @@ Slingshot.S3Storage = {
             name: name,
             value: value
           };
-      }).compact().value())
+      }).compact().value()),
+      method: "POST"
     };
+  },
+
+  createPolicy: function (directive, file) {
+    return new Slingshot.StoragePolicy()
+      .expireIn(directive.expire)
+      .contentLength(0, Math.min(file.size, directive.maxSize || Infinity));
+  },
+
+  getPayload: function (method, directive, file, meta) {
+    return {
+      key: this.objectName(method, directive, file, meta),
+
+      bucket: directive.bucket,
+
+      "Content-Type": file.type,
+      "acl": directive.acl,
+
+      "Cache-Control": directive.cacheControl,
+      "Content-Disposition": this.contentDisposition(directive, file)
+    };
+  },
+
+  objectName: function (method, directive, file, meta) {
+    return _.isFunction(directive.key) ?
+      directive.key.call(method, file, meta) : directive.key;
+  },
+
+  contentDisposition: function (directive, file) {
+    return directive.contentDisposition || file.name &&
+      "inline; filename=" + quoteString(file.name, '"');
+  },
+
+  downloadUrl: function (directive, key) {
+    var url = Npm.require("url"),
+        bucketUrl = this.bucketUrl(directive);
+
+    return url.format(_.extend(url.parse(directive.cdn || bucketUrl), {
+      pathname: key
+    }));
+  },
+
+  bucketUrl: function (directive) {
+    return _.isFunction(directive.bucketUrl) ?
+      directive.bucketUrl(directive.bucket, directive.region) :
+      directive.bucketUrl;
   },
 
   /** Applies signature an upload payload
@@ -170,12 +193,3 @@ function formatNumber(num, digits) {
   return Array(digits - string.length + 1).join("0").concat(string);
 }
 
-var crypto = Npm.require("crypto");
-
-function hmac256(key, data, encoding) {
-  /* global Buffer: false */
-  return crypto
-    .createHmac("sha256", key)
-    .update(new Buffer(data, "utf-8"))
-    .digest(encoding);
-}

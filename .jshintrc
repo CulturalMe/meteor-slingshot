@@ -74,7 +74,7 @@
   "dojo"          : false,    // Dojo Toolkit
   "jquery"        : false,    // jQuery
   "mootools"      : false,    // MooTools
-  "node"          : false,    // Node.js
+  "node"          : true,    // Node.js
   "nonstandard"   : false,    // Widely adopted globals (escape, unescape, etc)
   "prototypejs"   : false,    // Prototype and Scriptaculous
   "rhino"         : false,    // Rhino
@@ -124,8 +124,10 @@
     "$": false,
 
     //Internals
-    "S3Policy": false,
     "Slingshot": true,
-    "matchAllowedFileTypes": false
+    "oauth": false,
+    "matchAllowedFileTypes": false,
+    "rsaSha256": false,
+    "hmac256": false
   }
 }

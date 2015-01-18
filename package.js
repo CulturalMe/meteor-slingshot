@@ -8,6 +8,7 @@ Package.describe({
 Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
 
+  api.use("http", "server");
   api.use(["underscore", "check"]);
   api.use(["tracker", "reactive-var"], "client");
 
@@ -19,10 +20,13 @@ Package.on_use(function (api) {
   api.add_files("lib/upload.js", "client");
 
   api.add_files([
+    "lib/utils.js",
     "lib/directive.js",
     "lib/storage-policy.js",
+    "lib/oauth2.js",
     "services/aws-s3.js",
     "services/google-cloud.js",
+    "services/google-cloud-resumable.js",
     "services/rackspace.js"
   ], "server");
 
