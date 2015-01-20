@@ -47,6 +47,9 @@ Slingshot.S3Storage = {
     .extend({
       bucket: Meteor.settings.S3Bucket,
       bucketUrl: function (bucket, region) {
+        if (region === "us-east-1")
+          return "https://" + bucket + ".s3.amazonaws.com";
+
         return "https://" + bucket + ".s3-" + region + ".amazonaws.com";
       },
       region: Meteor.settings.AWSRegion || "us-east-1",
