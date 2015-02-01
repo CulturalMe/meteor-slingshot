@@ -90,11 +90,17 @@ Slingshot.S3Storage = {
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
           directive.bucketUrl(directive.bucket, directive.region) :
-          directive.bucketUrl,
+          directive.bucketUrl
 
-        download = _.extend(url.parse(directive.cdn || bucketUrl), {
-          pathname: directive.bucket +"/" + payload.key
-        });
+        if (directive.cdn) {
+          download = _.extend(url.parse(directive.cdn), {
+            pathname: payload.key
+          });
+        } else {
+          download = _.extend(url.parse(bucketUrl), {
+            pathname: directive.bucket +"/" + payload.key
+          });
+        }
 
     this.applySignature(payload, policy, directive);
 
