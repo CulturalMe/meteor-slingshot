@@ -423,6 +423,14 @@ Meteor core packages:
  * reactive-var
  * check
 
+## Troubleshooting and Help
+
+If you are having any queries about how to use slingshot, or how to get it to work with
+the different services or any other general questions about it, please [post a question on Stack Overflow](http://stackoverflow.com/questions/ask?tags=meteor-slingshot). You will get a high
+quality answer there much quicker than by posting an issue here on github.
+
+Bug reports, Feature Requests and Pull Requests are always welcome.
+
 ## API Reference
 
 ### Directives
