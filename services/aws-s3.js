@@ -98,8 +98,12 @@ Slingshot.S3Storage = {
 
     this.applySignature(payload, policy, directive);
 
+    upload = (directive.region === "us-east-1") ?
+      "https://s3.amazonaws.com" : "https://s3-" + directive.region + ".amazonaws.com";
+    upload = upload + "/" + directive.bucket;
+
     return {
-      upload: bucketUrl,
+      upload: upload,
       download: url.format(download),
       postData: [{
         name: "key",
