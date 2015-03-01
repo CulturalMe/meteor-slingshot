@@ -48,9 +48,9 @@ Slingshot.S3Storage = {
       bucket: Meteor.settings.S3Bucket,
       bucketUrl: function (bucket, region) {
         if (region === "us-east-1")
-          return "https://" + bucket + ".s3.amazonaws.com";
+          return "https://s3.amazonaws.com";
 
-        return "https://" + bucket + ".s3-" + region + ".amazonaws.com";
+        return "https://s3-" + region + ".amazonaws.com";
       },
       region: Meteor.settings.AWSRegion || "us-east-1",
       expire: 5 * 60 * 1000 //in 5 minutes
@@ -90,16 +90,22 @@ Slingshot.S3Storage = {
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
           directive.bucketUrl(directive.bucket, directive.region) :
-          directive.bucketUrl,
+          directive.bucketUrl
 
-        download = _.extend(url.parse(directive.cdn || bucketUrl), {
-          pathname: payload.key
-        });
+        if (directive.cdn) {
+          download = _.extend(url.parse(directive.cdn), {
+            pathname: payload.key
+          });
+        } else {
+          download = _.extend(url.parse(bucketUrl), {
+            pathname: directive.bucket +"/" + payload.key
+          });
+        }
 
     this.applySignature(payload, policy, directive);
 
     return {
-      upload: bucketUrl,
+      upload: bucketUrl+"/"+directive.bucket,
       download: url.format(download),
       postData: [{
         name: "key",
