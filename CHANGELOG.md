@@ -5,7 +5,7 @@ Slingshot Changelog
 
 ### Bug Fixes
 
- * Fixed error when `accounts-base` is not enabled. (([#65](https://github.com/CulturalMe/meteor-slingshot/issues/65)
+ * Fixed error when `accounts-base` is not enabled. ([#65](https://github.com/CulturalMe/meteor-slingshot/issues/65))
 
 ### Enhancements
 
