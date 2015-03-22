@@ -1,7 +1,7 @@
 Slingshot Changelog
 ===================
 
-## Version 0.5.0
+## Version 0.6.0
 
 ### Bug Fixes
 
@@ -10,6 +10,10 @@ Slingshot Changelog
 ### Enhancements
 
  * Allow SSL to work for when bucket name contains a dot.
+
+## Version 0.5.0
+
+No changes. (incorrectly released)
 
 ## Version 0.4.1
 
