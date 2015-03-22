@@ -1,6 +1,16 @@
 Slingshot Changelog
 ===================
 
+## Version 0.5.0
+
+### Bug Fixes
+
+ * Fixed error when `accounts-base` is not enabled. (([#65](https://github.com/CulturalMe/meteor-slingshot/issues/65)
+
+### Enhancements
+
+ * Allow SSL to work for when bucket name contains a dot.
+
 ## Version 0.4.1
 
 ### Bug Fixes
