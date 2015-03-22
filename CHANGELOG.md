@@ -1,6 +1,12 @@
 Slingshot Changelog
 ===================
 
+## Version 0.4.1
+
+### Bug Fixes
+
+ * Fixed `us-east-1` default bucket url for S3 ([#53](https://github.com/CulturalMe/meteor-slingshot/issues/53))
+
 ## Version 0.4.0
 
 ### New Features and Enhancements
@@ -25,7 +31,7 @@ Slingshot Changelog
 
 ### Bug Fixes
 
- * Fixed uploads for undetectable mime-type ([#34](https://github.com/CulturalMe/meteor-slingshot/issues))
+ * Fixed uploads for undetectable mime-type ([#34](https://github.com/CulturalMe/meteor-slingshot/issues/34))
 
 ## Version 0.2.0
 
