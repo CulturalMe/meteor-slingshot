@@ -1,6 +1,12 @@
 Slingshot Changelog
 ===================
 
+## Version 0.6.1
+
+### Enhancements
+
+ * Added a way to get the server response to the uploader. ([#82](https://github.com/CulturalMe/meteor-slingshot/issues/82))
+
 ## Version 0.6.0
 
 ### Bug Fixes
