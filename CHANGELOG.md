@@ -9,7 +9,7 @@ Slingshot Changelog
 
 ### Enhancements
 
- * Allow SSL to work for when bucket name contains a dot.
+ * Allow SSL to work for when the S3 bucket name contains a dot.
 
 ## Version 0.5.0
 
