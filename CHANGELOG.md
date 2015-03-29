@@ -3,8 +3,13 @@ Slingshot Changelog
 
 ## Version 0.6.1
 
- * Fixed bad S3 download url generation where the download url would start with `https:/` instead of `https://`. ([#84](https://github.com/CulturalMe/meteor-slingshot/issues/84))
+### Enhancements
 
+ * Added a way to get the server response to the uploader. ([#82](https://github.com/CulturalMe/meteor-slingshot/issues/82))
+
+### Bug Fixes
+
+ * Fixed bad S3 download url generation where the download url would start with `https:/` instead of `https://`. ([#84](https://github.com/CulturalMe/meteor-slingshot/issues/84))
 
 ## Version 0.6.0
 
