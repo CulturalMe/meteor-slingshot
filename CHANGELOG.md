@@ -1,5 +1,8 @@
 Slingshot Changelog
 ===================
+## Version 0.6.2
+
+Removed debugging log.
 
 ## Version 0.6.1
 
