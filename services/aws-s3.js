@@ -105,8 +105,6 @@ Slingshot.S3Storage = {
 
     this.applySignature(payload, policy, directive);
 
-    console.log(downloadUrl);
-
     return {
       upload: bucketUrl,
       download: downloadUrl,
