@@ -1,5 +1,32 @@
 Slingshot Changelog
 ===================
+## Version 0.6.2
+
+Removed debugging log.
+
+## Version 0.6.1
+
+### Enhancements
+
+ * Added a way to get the server response to the uploader. ([#82](https://github.com/CulturalMe/meteor-slingshot/issues/82))
+
+### Bug Fixes
+
+ * Fixed bad S3 download url generation where the download url would start with `https:/` instead of `https://`. ([#84](https://github.com/CulturalMe/meteor-slingshot/issues/84))
+
+## Version 0.6.0
+
+### Bug Fixes
+
+ * Fixed error when `accounts-base` is not enabled. ([#65](https://github.com/CulturalMe/meteor-slingshot/issues/65))
+
+### Enhancements
+
+ * Allow SSL to work for when the S3 bucket name contains a dot.
+
+## Version 0.5.0
+
+No changes. (incorrectly released)
 
 ## Version 0.4.1
 

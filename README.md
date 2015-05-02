@@ -1,4 +1,4 @@
-meteor-slingshot 
+meteor-slingshot
 ================
 
 [![](https://api.travis-ci.org/CulturalMe/meteor-slingshot.svg)](https://travis-ci.org/CulturalMe/meteor-slingshot) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CulturalMe/meteor-slingshot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -38,7 +38,14 @@ On the client side we can now upload files through to the bucket:
 var uploader = new Slingshot.Upload("myFileUploads");
 
 uploader.send(document.getElementById('input').files[0], function (error, downloadUrl) {
-  Meteor.users.update(Meteor.userId(), {$push: {"profile.files": downloadUrl}});
+  if (error) {
+    // Log service detailed response
+    console.error('Error uploading', uploader.xhr.response);
+    alert (error);
+  }
+  else {
+    Meteor.users.update(Meteor.userId(), {$push: {"profile.files": downloadUrl}});
+  }
 });
 ```
 
@@ -422,6 +429,14 @@ Meteor core packages:
  * tracker
  * reactive-var
  * check
+
+## Troubleshooting and Help
+
+If you are having any queries about how to use slingshot, or how to get it to work with
+the different services or any other general questions about it, please [post a question on Stack Overflow](http://stackoverflow.com/questions/ask?tags=meteor-slingshot). You will get a high
+quality answer there much quicker than by posting an issue here on github.
+
+Bug reports, Feature Requests and Pull Requests are always welcome.
 
 ## API Reference
 

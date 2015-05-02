@@ -20,14 +20,14 @@ Slingshot.S3Storage = {
       check(acl, String);
 
       return [
-        "private",
-        "public-read",
-        "public-read-write",
-        "authenticated-read",
-        "bucket-owner-read",
-        "bucket-owner-full-control",
-        "log-delivery-write"
-      ].indexOf(acl) >= 0;
+          "private",
+          "public-read",
+          "public-read-write",
+          "authenticated-read",
+          "bucket-owner-read",
+          "bucket-owner-full-control",
+          "log-delivery-write"
+        ].indexOf(acl) >= 0;
     })),
 
     key: Match.OneOf(String, Function),
@@ -47,10 +47,14 @@ Slingshot.S3Storage = {
     .extend({
       bucket: Meteor.settings.S3Bucket,
       bucketUrl: function (bucket, region) {
+        var bucketDomain = "s3-" + region + ".amazonaws.com";
         if (region === "us-east-1")
-          return "https://" + bucket + ".s3.amazonaws.com";
+          bucketDomain = "s3.amazonaws.com";
 
-        return "https://" + bucket + ".s3-" + region + ".amazonaws.com";
+        if (bucket.indexOf(".") !== -1)
+          return "https://" + bucketDomain + "/" + bucket;
+
+        return "https://" + bucket + "." + bucketDomain;
       },
       region: Meteor.settings.AWSRegion || "us-east-1",
       expire: 5 * 60 * 1000 //in 5 minutes
@@ -92,24 +96,27 @@ Slingshot.S3Storage = {
           directive.bucketUrl(directive.bucket, directive.region) :
           directive.bucketUrl,
 
-        download = _.extend(url.parse(directive.cdn || bucketUrl), {
-          pathname: payload.key
-        });
+        downloadUrl = [
+          (directive.cdn || bucketUrl),
+          payload.key
+        ].map(function (part) {
+            return part.replace(/\/+$/, '');
+          }).join("/");
 
     this.applySignature(payload, policy, directive);
 
     return {
       upload: bucketUrl,
-      download: url.format(download),
+      download: downloadUrl,
       postData: [{
         name: "key",
         value: payload.key
       }].concat(_.chain(payload).omit("key").map(function (value, name) {
           return !_.isUndefined(value) && {
-            name: name,
-            value: value
-          };
-      }).compact().value())
+              name: name,
+              value: value
+            };
+        }).compact().value())
     };
   },
 
