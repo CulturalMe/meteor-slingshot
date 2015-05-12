@@ -469,6 +469,8 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 `AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
+`AWSSessionToken` String (optional) - Session token included in temporary security credentials.
+
 #### Google Cloud Storage
 
 `bucket` String (**required**) - Name of bucket to use. The default is

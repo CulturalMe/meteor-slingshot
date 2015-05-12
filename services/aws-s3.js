@@ -2,6 +2,7 @@ Slingshot.S3Storage = {
 
   accessId: "AWSAccessKeyId",
   secretKey: "AWSSecretAccessKey",
+  sessionToken: "AWSSessionToken",
 
   directiveMatch: {
     bucket: String,
@@ -15,6 +16,7 @@ Slingshot.S3Storage = {
 
     AWSAccessKeyId: String,
     AWSSecretAccessKey: String,
+    AWSSessionToken: Match.Optional(String),
 
     acl: Match.Optional(Match.Where(function (acl) {
       check(acl, String);
@@ -144,6 +146,10 @@ Slingshot.S3Storage = {
       ].join("/"),
       "x-amz-date": today + "T000000Z"
     });
+
+    if (directive[this.sessionToken]) {
+        payload["x-amz-security-token"] = directive[this.sessionToken];
+    }
 
     payload.policy = policy.match(payload).stringify();
     payload["x-amz-signature"] = this.signAwsV4(payload.policy,
