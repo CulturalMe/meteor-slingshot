@@ -138,7 +138,8 @@ Slingshot.S3Storage = {
     _.extend(payload, {
       "x-amz-algorithm": "AWS4-HMAC-SHA256",
       "x-amz-credential": [
-        _.isFunction(directive[this.accessId]) ? directive[this.accessId]() : directive[this.accessId],
+        _.isFunction(directive[this.accessId]) ? directive[this.accessId]() :
+          directive[this.accessId],
         today,
         directive.region,
         service,
@@ -153,7 +154,8 @@ Slingshot.S3Storage = {
 
     payload.policy = policy.match(payload).stringify();
     payload["x-amz-signature"] = this.signAwsV4(payload.policy,
-      _.isFunction(directive[this.secretKey]) ? directive[this.secretKey]() : directive[this.secretKey],
+      _.isFunction(directive[this.secretKey]) ? directive[this.secretKey]() :
+        directive[this.secretKey],
       today, directive.region, service);
   },
 
