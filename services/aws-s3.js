@@ -14,9 +14,9 @@ Slingshot.S3Storage = {
       return /^[a-z]{2}-\w+-\d+$/.test(region);
     }),
 
-    AWSAccessKeyId: String,
-    AWSSecretAccessKey: String,
-    AWSSessionToken: Match.Optional(String),
+    AWSAccessKeyId: Match.OneOf(String, Function),
+    AWSSecretAccessKey: Match.OneOf(String, Function),
+    AWSSessionToken: Match.Optional(Match.OneOf(String, Function)),
 
     acl: Match.Optional(Match.Where(function (acl) {
       check(acl, String);
@@ -138,7 +138,7 @@ Slingshot.S3Storage = {
     _.extend(payload, {
       "x-amz-algorithm": "AWS4-HMAC-SHA256",
       "x-amz-credential": [
-        directive[this.accessId],
+        _.isFunction(directive[this.accessId]) ? directive[this.accessId]() : directive[this.accessId],
         today,
         directive.region,
         service,
@@ -148,12 +148,14 @@ Slingshot.S3Storage = {
     });
 
     if (directive[this.sessionToken]) {
-      payload["x-amz-security-token"] = directive[this.sessionToken];
+      payload["x-amz-security-token"] = _.isFunction(directive[this.sessionToken]) ? directive[this.sessionToken]() :
+        directive[this.sessionToken];
     }
 
     payload.policy = policy.match(payload).stringify();
     payload["x-amz-signature"] = this.signAwsV4(payload.policy,
-      directive[this.secretKey], today, directive.region, service);
+      _.isFunction(directive[this.secretKey]) ? directive[this.secretKey]() : directive[this.secretKey],
+      today, directive.region, service);
   },
 
   /** Generate a AWS Signature Version 4
