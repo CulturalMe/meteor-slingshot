@@ -471,8 +471,8 @@ are no arguments and the key (a string) is returned.
 `AWSSecretAccessKey` String or Function (**required**) - Can also be set in `Meteor.settings`. If it is a function,
 there are no arguments and the key (a string) is returned.
 
-`AWSSessionToken` String or Function (optional) - Session token included in temporary security credentials. If it is a
-function, there are no arguments and the token (a string) is returned.
+`AWSSessionToken` Function (optional) - Takes no arguments and returns the session token from temporary security
+credentials (a string).
 
 #### Google Cloud Storage
 
