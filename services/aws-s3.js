@@ -20,14 +20,14 @@ Slingshot.S3Storage = {
       check(acl, String);
 
       return [
-        "private",
-        "public-read",
-        "public-read-write",
-        "authenticated-read",
-        "bucket-owner-read",
-        "bucket-owner-full-control",
-        "log-delivery-write"
-      ].indexOf(acl) >= 0;
+          "private",
+          "public-read",
+          "public-read-write",
+          "authenticated-read",
+          "bucket-owner-read",
+          "bucket-owner-full-control",
+          "log-delivery-write"
+        ].indexOf(acl) >= 0;
     })),
 
     key: Match.OneOf(String, Function),
@@ -74,8 +74,6 @@ Slingshot.S3Storage = {
   upload: function (method, directive, file, meta) {
     var url = Npm.require("url"),
 
-        path = Npm.require("path"),
-
         policy = new Slingshot.StoragePolicy()
           .expireIn(directive.expire)
           .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
@@ -98,24 +96,27 @@ Slingshot.S3Storage = {
           directive.bucketUrl(directive.bucket, directive.region) :
           directive.bucketUrl,
 
-        downloadPath = path.join((directive.cdn || bucketUrl), payload.key),
-
-        download = url.parse(downloadPath);
+        downloadUrl = [
+          (directive.cdn || bucketUrl),
+          payload.key
+        ].map(function (part) {
+            return part.replace(/\/+$/, '');
+          }).join("/");
 
     this.applySignature(payload, policy, directive);
 
     return {
       upload: bucketUrl,
-      download: url.format(download),
+      download: downloadUrl,
       postData: [{
         name: "key",
         value: payload.key
       }].concat(_.chain(payload).omit("key").map(function (value, name) {
           return !_.isUndefined(value) && {
-            name: name,
-            value: value
-          };
-      }).compact().value())
+              name: name,
+              value: value
+            };
+        }).compact().value())
     };
   },
 
