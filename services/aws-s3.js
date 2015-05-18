@@ -89,7 +89,8 @@ Slingshot.S3Storage = {
 
           "Cache-Control": directive.cacheControl,
           "Content-Disposition": directive.contentDisposition || file.name &&
-            "inline; filename=" + quoteString(file.name, '"')
+            "inline; filename=" + quoteString(file.name, '"') +
+            "; filename*=utf-8''" + encodeURIComponent(file.name)
         },
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
