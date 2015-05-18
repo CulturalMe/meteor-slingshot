@@ -230,6 +230,53 @@ Slingshot.createDirective("aws-s3-example", Slingshot.S3Storage, {
 });
 ```
 
+#### S3 with temporary AWS Credentials (Advanced)
+
+For extra security you can use
+[temporary credentials](http://docs.aws.amazon.com/STS/latest/UsingSTS/CreatingSessionTokens.html) to sign upload requests.
+
+```JavaScript
+var sts = new AWS.STS(); // Using the AWS SDK to retrieve temporary credentials
+
+Slingshot.createDirective('myUploads', Slingshot.S3Storage.TempCredentials, {
+  bucket: 'myBucket',
+  temporaryCredentials: Meteor.wrapAsync(function (expire, callback) {
+    //AWS dictates that the minimum duration must be 900 seconds:
+    var duration = Math.max(Math.round(expire / 1000), 900);
+
+    sts.getSessionToken({
+        DurationSeconds: duration
+    }, function (error, result) {
+      callback(error, result && result.Credentials);
+    });
+  })
+});
+```
+
+If you are running slingshot on an EC2 instance, you can conveniantly retreive
+your access keys with [`AWS.EC2MetadataCredentials`](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/EC2MetadataCredentials.html):
+
+```JavaScript
+var credentials = new AWS.EC2MetadataCredentials();
+
+var updateCredentials = Meteor.wrapAsync(credentials.get, credentials);
+
+Slingshot.createDirective('myUploads', Slingshot.S3Storage.TempCredentials, {
+  bucket: 'myBucket',
+  temporaryCredentials: function () {
+    if (credentials.needsRefresh()) {
+      updateCredentials();
+    }
+
+    return {
+      AccessKeyId: credentials.accessKeyId,
+      SecretAccessKey: credentials.secretAccessKey,
+      SessionToken: credentials.sessionToken
+    };
+  })
+});
+```
+
 ### Google Cloud
 
 [Generate a private key](http://goo.gl/kxt5qz) and convert it to a `.pem` file
@@ -457,24 +504,26 @@ i.e. `"https://d111111abcdef8.cloudfront.net"`
 `expire` Number (optional) - Number of milliseconds in which an upload
 authorization will expire after the request was made. Default is 5 minutes.
 
-#### AWS S3
-
-`bucket` String (**required**) - Name of bucket to use. The default is
-`Meteor.settings.S3Bucket`.
+#### AWS S3 (`Slingshot.S3Storage`)
 
 `region` String (optional) - Default is `Meteor.settings.AWSRegion` or
 "us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
 
-`AWSAccessKeyId` String or Function (**required**) - Can also be set in `Meteor.settings`. If it is a function, there
-are no arguments and the key (a string) is returned.
+`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
-`AWSSecretAccessKey` String or Function (**required**) - Can also be set in `Meteor.settings`. If it is a function,
-there are no arguments and the key (a string) is returned.
+`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
 
-`AWSSessionToken` Function (optional) - Takes an expiry date argumnet and
-returns the session token from temporary security credentials (a string).
+#### AWS S3 with Temporary Credentials (`Slingshot.S3Storage.TempCredentials`)
 
-#### Google Cloud Storage
+`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
+"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
+
+`temporaryCredentials` Function (**required**) - Function that generates temporary
+credentials. It takes a signle argument, which is the minumum desired expiration
+time in milli-seconds and it returns an object that contains `AccessKeyId`,
+`SecretAccessKey` and `SessionToken`.
+
+#### Google Cloud Storage (`Slingshot.GoogleCloud`)
 
 `bucket` String (**required**) - Name of bucket to use. The default is
 `Meteor.settings.GoogleCloudBucket`.
@@ -505,7 +554,7 @@ the second is the meta-information that can be passed by the client.
 `contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
 Default is the uploaded file's name (inline). Use null to disable.
 
-#### Rackspace Cloud
+#### Rackspace Cloud (`Slingshot.RackspaceFiles`)
 
 `RackspaceAccountId` String (**required**) - Can also be set in `Meteor.settings`.
 

@@ -135,8 +135,7 @@ Slingshot.S3Storage = {
     _.extend(payload, {
       "x-amz-algorithm": "AWS4-HMAC-SHA256",
       "x-amz-credential": [
-        _.isFunction(directive[this.accessId]) ? directive[this.accessId]() :
-          directive[this.accessId],
+        directive[this.accessId],
         today,
         directive.region,
         service,
@@ -147,9 +146,7 @@ Slingshot.S3Storage = {
 
     payload.policy = policy.match(payload).stringify();
     payload["x-amz-signature"] = this.signAwsV4(payload.policy,
-      _.isFunction(directive[this.secretKey]) ? directive[this.secretKey]() :
-        directive[this.secretKey],
-      today, directive.region, service);
+      directive[this.secretKey], today, directive.region, service);
   },
 
   /** Generate a AWS Signature Version 4
@@ -177,7 +174,7 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
   directiveMatch: _.chain(Slingshot.S3Storage.directiveMatch)
     .omit("AWSAccessKeyId", "AWSSecretAccessKey")
     .extend({
-      sessionCredentials: Function
+      temporaryCredentials: Function
     })
     .value(),
 
@@ -185,7 +182,7 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
     "AWSAccessKeyId", "AWSSecretAccessKey"),
 
   applySignature: function (payload, policy, directive) {
-    var credentials = directive.sessionCredentials(directive.expire);
+    var credentials = directive.temporaryCredentials(directive.expire);
 
     check(credentials, Match.ObjectIncluding({
       AccessKeyId: Slingshot.S3Storage.directiveMatch.AWSAccessKeyId,
