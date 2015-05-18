@@ -273,7 +273,7 @@ Slingshot.createDirective('myUploads', Slingshot.S3Storage.TempCredentials, {
       SecretAccessKey: credentials.secretAccessKey,
       SessionToken: credentials.sessionToken
     };
-  })
+  }
 });
 ```
 
