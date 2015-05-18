@@ -72,9 +72,7 @@ Slingshot.S3Storage = {
    */
 
   upload: function (method, directive, file, meta) {
-    var url = Npm.require("url"),
-
-        policy = new Slingshot.StoragePolicy()
+    var policy = new Slingshot.StoragePolicy()
           .expireIn(directive.expire)
           .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
 
@@ -89,7 +87,8 @@ Slingshot.S3Storage = {
 
           "Cache-Control": directive.cacheControl,
           "Content-Disposition": directive.contentDisposition || file.name &&
-            "inline; filename=" + quoteString(file.name, '"')
+            "inline; filename=" + quoteString(file.name, '"') +
+            "; filename*=utf-8''" + encodeURIComponent(file.name)
         },
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
@@ -169,6 +168,37 @@ Slingshot.S3Storage = {
     return hmac256(signingKey, policy, "hex");
   }
 };
+
+Slingshot.S3Storage.TempCredentials = _.defaults({
+
+  directiveMatch: _.chain(Slingshot.S3Storage.directiveMatch)
+    .omit("AWSAccessKeyId", "AWSSecretAccessKey")
+    .extend({
+      temporaryCredentials: Function
+    })
+    .value(),
+
+  directiveDefault: _.omit(Slingshot.S3Storage.directiveDefault,
+    "AWSAccessKeyId", "AWSSecretAccessKey"),
+
+  applySignature: function (payload, policy, directive) {
+    var credentials = directive.temporaryCredentials(directive.expire);
+
+    check(credentials, Match.ObjectIncluding({
+      AccessKeyId: Slingshot.S3Storage.directiveMatch.AWSAccessKeyId,
+      SecretAccessKey: Slingshot.S3Storage.directiveMatch.AWSSecretAccessKey,
+      SessionToken: String
+    }));
+
+    payload["x-amz-security-token"] = credentials.SessionToken;
+
+    return Slingshot.S3Storage.applySignature
+      .call(this, payload, policy, _.defaults({
+        AWSAccessKeyId: credentials.AccessKeyId,
+        AWSSecretAccessKey: credentials.SecretAccessKey
+      }, directive));
+  }
+}, Slingshot.S3Storage);
 
 function quoteString(string, quotes) {
   return quotes + string.replace(quotes, '\\' + quotes) + quotes;
