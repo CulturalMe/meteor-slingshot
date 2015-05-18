@@ -2,7 +2,6 @@ Slingshot.S3Storage = {
 
   accessId: "AWSAccessKeyId",
   secretKey: "AWSSecretAccessKey",
-  sessionToken: "AWSSessionToken",
 
   directiveMatch: {
     bucket: String,
@@ -14,9 +13,8 @@ Slingshot.S3Storage = {
       return /^[a-z]{2}-\w+-\d+$/.test(region);
     }),
 
-    AWSAccessKeyId: Match.OneOf(String, Function),
-    AWSSecretAccessKey: Match.OneOf(String, Function),
-    AWSSessionToken: Match.Optional(Function),
+    AWSAccessKeyId: String,
+    AWSSecretAccessKey: String,
 
     acl: Match.Optional(Match.Where(function (acl) {
       check(acl, String);
@@ -74,9 +72,7 @@ Slingshot.S3Storage = {
    */
 
   upload: function (method, directive, file, meta) {
-    var url = Npm.require("url"),
-
-        policy = new Slingshot.StoragePolicy()
+    var policy = new Slingshot.StoragePolicy()
           .expireIn(directive.expire)
           .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
 
@@ -149,11 +145,6 @@ Slingshot.S3Storage = {
       "x-amz-date": today + "T000000Z"
     });
 
-    if (directive[this.sessionToken]) {
-      payload["x-amz-security-token"] =
-        directive[this.sessionToken](directive.expire);
-    }
-
     payload.policy = policy.match(payload).stringify();
     payload["x-amz-signature"] = this.signAwsV4(payload.policy,
       _.isFunction(directive[this.secretKey]) ? directive[this.secretKey]() :
@@ -180,6 +171,37 @@ Slingshot.S3Storage = {
     return hmac256(signingKey, policy, "hex");
   }
 };
+
+Slingshot.S3Storage.TempCredentials = _.defaults({
+
+  directiveMatch: _.chain(Slingshot.S3Storage.directiveMatch)
+    .omit("AWSAccessKeyId", "AWSSecretAccessKey")
+    .extend({
+      sessionCredentials: Function
+    })
+    .value(),
+
+  directiveDefault: _.omit(Slingshot.S3Storage.directiveDefault,
+    "AWSAccessKeyId", "AWSSecretAccessKey"),
+
+  applySignature: function (payload, policy, directive) {
+    var credentials = directive.sessionCredentials(directive.expire);
+
+    check(credentials, Match.ObjectIncluding({
+      AccessKeyId: Slingshot.S3Storage.directiveMatch.AWSAccessKeyId,
+      SecretAccessKey: Slingshot.S3Storage.directiveMatch.AWSSecretAccessKey,
+      SessionToken: String
+    }));
+
+    payload["x-amz-security-token"] = credentials.SessionToken;
+
+    return Slingshot.S3Storage.applySignature
+      .call(this, payload, policy, _.defaults({
+        AWSAccessKeyId: credentials.AccessKeyId,
+        AWSSecretAccessKey: credentials.SecretAccessKey
+      }, directive));
+  }
+}, Slingshot.S3Storage);
 
 function quoteString(string, quotes) {
   return quotes + string.replace(quotes, '\\' + quotes) + quotes;
