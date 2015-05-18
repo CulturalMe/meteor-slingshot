@@ -5,11 +5,11 @@ Slingshot Changelog
 
 ### Enhancements
 
- * Added `Slingshot.S3Storage.TempCredentials`. Thanks @jossoco
+ * Added `Slingshot.S3Storage.TempCredentials` ([#95](https://github.com/CulturalMe/meteor-slingshot/issues/95)). Thanks @jossoco
 
 ### Bug Fixes
 
- * Fixed character encoding for content-disposition for AWS-S3 based directives ([#95](https://github.com/CulturalMe/meteor-slingshot/issues/95)). Thanks @timtch.
+ * Fixed character encoding for content-disposition for AWS-S3 based directives. Thanks @timtch.
 
 ## Version 0.6.2
 
