@@ -471,8 +471,8 @@ are no arguments and the key (a string) is returned.
 `AWSSecretAccessKey` String or Function (**required**) - Can also be set in `Meteor.settings`. If it is a function,
 there are no arguments and the key (a string) is returned.
 
-`AWSSessionToken` Function (optional) - Takes no arguments and returns the session token from temporary security
-credentials (a string).
+`AWSSessionToken` Function (optional) - Takes an expiry date argumnet and
+returns the session token from temporary security credentials (a string).
 
 #### Google Cloud Storage
 
@@ -513,11 +513,15 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 `container` String (**required**) - Name of container to use.
 
-`region` String (optional) - Data Center region. The default is `"iad3"`. [See other regions](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Service-Access-Endpoints-d1e003.html)
+`region` String (optional) - Data Center region. The default is `"iad3"`.
+[See other regions](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Service-Access-Endpoints-d1e003.html)
 
-`pathPrefix` String or Function (**required**) - Similar to `key` for S3, but will always be appended by `file.name` that is provided by the client.
+`pathPrefix` String or Function (**required**) - Similar to `key` for S3, but
+will always be appended by `file.name` that is provided by the client.
 
-`deleteAt` Date (optional) - Absolute time when the uploaded file is to be deleted. _This attribute is not enforced at all. It can be easily altered by the client_
+`deleteAt` Date (optional) - Absolute time when the uploaded file is to be
+deleted. _This attribute is not enforced at all. It can be easily altered by the
+client_
 
 `deleteAfter` Number (optional) - Same as `deleteAt`, but relative.
 

@@ -150,7 +150,8 @@ Slingshot.S3Storage = {
     });
 
     if (directive[this.sessionToken]) {
-      payload["x-amz-security-token"] = directive[this.sessionToken]();
+      payload["x-amz-security-token"] =
+        directive[this.sessionToken](directive.expire);
     }
 
     payload.policy = policy.match(payload).stringify();
