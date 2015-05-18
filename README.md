@@ -465,9 +465,14 @@ authorization will expire after the request was made. Default is 5 minutes.
 `region` String (optional) - Default is `Meteor.settings.AWSRegion` or
 "us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
 
-`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
+`AWSAccessKeyId` String or Function (**required**) - Can also be set in `Meteor.settings`. If it is a function, there
+are no arguments and the key (a string) is returned.
 
-`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
+`AWSSecretAccessKey` String or Function (**required**) - Can also be set in `Meteor.settings`. If it is a function,
+there are no arguments and the key (a string) is returned.
+
+`AWSSessionToken` Function (optional) - Takes no arguments and returns the session token from temporary security
+credentials (a string).
 
 #### Google Cloud Storage
 
@@ -510,7 +515,7 @@ Default is the uploaded file's name (inline). Use null to disable.
 
 `region` String (optional) - Data Center region. The default is `"iad3"`. [See other regions](http://docs.rackspace.com/files/api/v1/cf-devguide/content/Service-Access-Endpoints-d1e003.html)
 
-`pathPrefix` String or Function (**required**) - Simlar to `key` for S3, but will always be appended by `file.name` that is provided by the client.
+`pathPrefix` String or Function (**required**) - Similar to `key` for S3, but will always be appended by `file.name` that is provided by the client.
 
 `deleteAt` Date (optional) - Absolute time when the uploaded file is to be deleted. _This attribute is not enforced at all. It can be easily altered by the client_
 
