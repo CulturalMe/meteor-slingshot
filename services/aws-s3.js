@@ -39,7 +39,7 @@ Slingshot.S3Storage = {
     }),
 
     cacheControl: Match.Optional(String),
-    contentDisposition: Match.Optional(Match.OneOf(String, null))
+    contentDisposition: Match.Optional(Match.OneOf(String, Function, null))
   },
 
   directiveDefault: _.chain(Meteor.settings)
@@ -60,6 +60,22 @@ Slingshot.S3Storage = {
       expire: 5 * 60 * 1000 //in 5 minutes
     })
     .value(),
+
+  getContentDisposition: function (method, directive, file, meta) {
+    var getContentDisposition = directive.contentDisposition;
+
+    if (!_.isFunction(getContentDisposition)) {
+      getContentDisposition = function () {
+        var filename = file.name && encodeURIComponent(file.name);
+
+        return directive.contentDisposition || filename &&
+          "inline; filename=\"" + filename + "\"; filename*=utf-8''" +
+          filename;
+      };
+    }
+
+    return getContentDisposition.call(method, file, meta);
+  },
 
   /**
    *
@@ -86,9 +102,8 @@ Slingshot.S3Storage = {
           "acl": directive.acl,
 
           "Cache-Control": directive.cacheControl,
-          "Content-Disposition": directive.contentDisposition || file.name &&
-            "inline; filename=" + quoteString(file.name, '"') +
-            "; filename*=utf-8''" + encodeURIComponent(file.name)
+          "Content-Disposition": this.getContentDisposition(method, directive,
+            file, meta)
         },
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
@@ -200,9 +215,6 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
   }
 }, Slingshot.S3Storage);
 
-function quoteString(string, quotes) {
-  return quotes + string.replace(quotes, '\\' + quotes) + quotes;
-}
 
 function formatNumber(num, digits) {
   var string = String(num);
