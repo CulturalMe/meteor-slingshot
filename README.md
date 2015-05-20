@@ -60,6 +60,9 @@ Slingshot.fileRestrictions("myFileUploads", {
   maxSize: 10 * 1024 * 1024 // 10 MB (use null for unlimited)
 });
 ```
+
+Important: The `fileRestrictions` must be declared before the the directive is instantiated.
+
 ### Server side
 
 On the server we declare a directive that controls upload access rules:
@@ -551,8 +554,10 @@ the second is the meta-information that can be passed by the client.
 
 `cacheControl` String (optional) - RFC 2616 Cache-Control directive
 
-`contentDisposition` String (optional) - RFC 2616 Content-Disposition directive.
-Default is the uploaded file's name (inline). Use null to disable.
+`contentDisposition` String or Function (optional) - RFC 2616
+Content-Disposition directive. Default is the uploaded file's name (inline). If
+it is a function then it takes the same context and arguments as the `key`
+function. Use null to disable.
 
 #### Rackspace Cloud (`Slingshot.RackspaceFiles`)
 
