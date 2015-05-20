@@ -5,7 +5,7 @@ Package.describe({
     "/services/edgee:slingshot-google-cloud"
 });
 
-Package.on_use(function (api) {
+Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.0');
 
   api.use([
@@ -15,7 +15,7 @@ Package.on_use(function (api) {
     "edgee:slingshot-s3@0.8.0" // Google Cloud Storage is very similar to S3
   ]);
 
-  api.add_files("google-cloud.js", "server");
+  api.addFiles("google-cloud.js", "server");
 
   api.imply("edgee:slingshot");
 });

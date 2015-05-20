@@ -14,7 +14,7 @@ Package.on_use(function (api) {
     "edgee:slingshot@0.8.0"
   ]);
 
-  api.add_files([
+  api.addFiles([
     "storage-policy.js",
     "aws-s3.js"
   ], "server");
@@ -22,7 +22,7 @@ Package.on_use(function (api) {
   api.imply("edgee:slingshot");
 });
 
-Package.on_test(function (api) {
+Package.onTest(function (api) {
   api.use(["tinytest", "underscore", "edgee:slingshot-s3"]);
   api.add_files("test/aws-s3.js", "server");
 });

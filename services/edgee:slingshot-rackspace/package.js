@@ -5,7 +5,7 @@ Package.describe({
     "/services/edgee:slingshot-rackspace"
 });
 
-Package.on_use(function (api) {
+Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.0');
 
   api.use([
@@ -14,7 +14,7 @@ Package.on_use(function (api) {
     "edgee:slingshot@0.8.0"
   ]);
 
-  api.add_files("rackspace.js", "server");
+  api.addFiles("rackspace.js", "server");
 
   api.imply("edgee:slingshot");
 });
