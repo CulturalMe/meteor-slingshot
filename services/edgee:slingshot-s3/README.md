@@ -162,6 +162,7 @@ You could use this policy, but you may want to create one that is more permissiv
             },
             "Action": ["s3:PutObject"],
             "Resource": "arn:aws:s3:::examplebucket"
+        }
     ]
 }
 ```
