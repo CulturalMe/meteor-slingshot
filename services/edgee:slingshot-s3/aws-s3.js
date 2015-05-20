@@ -1,4 +1,4 @@
-Slingshot.S3Storage = {
+var S3Storage = {
 
   accessId: "AWSAccessKeyId",
   secretKey: "AWSSecretAccessKey",
@@ -184,6 +184,13 @@ Slingshot.S3Storage = {
   }
 };
 
+Object.defineProperty(Slingshot, "S3Storage", {
+  value: S3Storage,
+  writable: true,
+  configurable: true,
+  enumerable: true
+});
+
 Slingshot.S3Storage.TempCredentials = _.defaults({
 
   directiveMatch: _.chain(Slingshot.S3Storage.directiveMatch)
@@ -214,7 +221,6 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
       }, directive));
   }
 }, Slingshot.S3Storage);
-
 
 function formatNumber(num, digits) {
   var string = String(num);

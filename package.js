@@ -18,7 +18,7 @@ Package.on_use(function (api) {
 
   api.addFiles("lib/upload.js", "client");
 
-  api.addFiles("lib/directive.js", "server");
+  api.addFiles(["lib/directive.js", "lib/legacy.js"], "server");
 
   api.export("Slingshot");
 });
