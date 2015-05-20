@@ -1,6 +1,12 @@
 Slingshot Changelog
 ===================
 
+## Version 0.7.1
+
+### Enhancements
+
+ * Added support for dynamic content-disposition for S3 and Google Cloud ([#64](https://github.com/CulturalMe/meteor-slingshot/issues/64))
+
 ## Version 0.7.0
 
 ### Enhancements
