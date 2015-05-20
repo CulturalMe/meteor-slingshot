@@ -163,36 +163,6 @@ if (error) {
 The validate method will return `null` if valid and returns an `Error` instance
 if validation fails.
 
-
-### Google Cloud
-
-[Generate a private key](http://goo.gl/kxt5qz) and convert it to a `.pem` file
-using openssl:
-
-```
-openssl pkcs12 -in google-cloud-service-key.p12 -nodes -nocerts > google-cloud-service-key.pem
-```
-
-Setup CORS on the bucket:
-
-```
-gsutil cors set docs/gs-cors.json gs://mybucket
-```
-
-Save this file into the `/private` directory of your meteor app and add this
-line to your server-side code:
-
-```JavaScript
-Slingshot.GoogleCloud.directiveDefault.GoogleSecretKey = Assets.getText('google-cloud-service-key.pem');
-```
-Declare Google Cloud Storage Directives as follows:
-
-```JavaScript
-Slingshot.createDirective("google-cloud-example", Slingshot.GoogleCloud, {
-  //...
-});
-```
-
 ## Browser Compatibility
 
 Currently the uploader uses `XMLHttpRequest 2` to upload the files, which is not
@@ -333,8 +303,6 @@ Bug reports, Feature Requests and Pull Requests are always welcome.
 
 ### Directives
 
-#### General (All Services)
-
 `authorize`: Function (**required** unless set in File Restrictions)
 
 `maxSize`: Number (**required** unless set in File Restrictions)
@@ -347,39 +315,6 @@ i.e. `"https://d111111abcdef8.cloudfront.net"`
 
 `expire` Number (optional) - Number of milliseconds in which an upload
 authorization will expire after the request was made. Default is 5 minutes.
-
-#### Google Cloud Storage (`Slingshot.GoogleCloud`)
-
-`bucket` String (**required**) - Name of bucket to use. The default is
-`Meteor.settings.GoogleCloudBucket`.
-
-`GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
-
-`GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
-
-#### AWS S3 and Google Cloud Storage
-
-`bucket` String (**required**) - Name of bucket to use. The default is
-`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
-`Meteor.settings.S3Bucket`.
-
-`bucketUrl` String or Function (optional) - Override URL to which files are
- uploaded. If it is a function, then the first argument is the bucket name. This
- url also used for downloads unless a cdn is given.
-
-`key` String or Function (**required**) - Name of the file on the cloud storage
-service. If a function is provided, it will be called with `userId` in the
-context and its return value is used as the key. First argument is file info and
-the second is the meta-information that can be passed by the client.
-
-`acl` String (optional)
-
-`cacheControl` String (optional) - RFC 2616 Cache-Control directive
-
-`contentDisposition` String or Function (optional) - RFC 2616
-Content-Disposition directive. Default is the uploaded file's name (inline). If
-it is a function then it takes the same context and arguments as the `key`
-function. Use null to disable.
 
 ### File restrictions
 
