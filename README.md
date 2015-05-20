@@ -60,6 +60,9 @@ Slingshot.fileRestrictions("myFileUploads", {
   maxSize: 10 * 1024 * 1024 // 10 MB (use null for unlimited)
 });
 ```
+
+Important: The `fileRestrictions` must be declared before the the directive is instantiated.
+
 ### Server side
 
 On the server we declare a directive that controls upload access rules:
