@@ -1,15 +1,38 @@
-meteor-slingshot
-================
+Meteor edgee:slingshot
+======================
 
-[![](https://api.travis-ci.org/CulturalMe/meteor-slingshot.svg)](https://travis-ci.org/CulturalMe/meteor-slingshot) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CulturalMe/meteor-slingshot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![](https://api.travis-ci.org/CulturalMe/meteor-slingshot.svg)](https://travis-ci.org/CulturalMe/meteor-slingshot)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CulturalMe/meteor-slingshot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Direct and secure file-uploads to AWS S3, Google Cloud Storage and others.
 
 ## Install
 
+For AWS S3 ([docs](services/edgee:slingshot-s3/README.md)):
+
 ```bash
-meteor add edgee:slingshot
+meteor add edgee:slingshot-s3
 ```
+
+For Google Cloud Storage:
+
+```bash
+meteor add edgee:slingshot-google-cloud
+```
+
+For Rackspace Cloud Files:
+
+```bash
+meteor add edgee:slingshot-rackspace
+```
+
+## Update to Version 0.8.0
+
+Cloud-specific libraries have been moved into dedicated pacakges.
+
+You will need to add to respective package that you are using.
+
+(i.e. For AWS S3 use `edgee:slingshot-s3`)
 
 ## Why?
 
@@ -27,72 +50,6 @@ entire public.
 
 File uploads can not only be restricted by file-size and file-type, but also by
 other stateful criteria such as the current meteor user.
-
-## Quick Example
-
-### Client side
-
-On the client side we can now upload files through to the bucket:
-
-```JavaScript
-var uploader = new Slingshot.Upload("myFileUploads");
-
-uploader.send(document.getElementById('input').files[0], function (error, downloadUrl) {
-  if (error) {
-    // Log service detailed response
-    console.error('Error uploading', uploader.xhr.response);
-    alert (error);
-  }
-  else {
-    Meteor.users.update(Meteor.userId(), {$push: {"profile.files": downloadUrl}});
-  }
-});
-```
-
-### Client and Server
-
-These file upload restrictions are validated on the client and then appended to
-the directive on the server side to enforce them:
-
-```JavaScript
-Slingshot.fileRestrictions("myFileUploads", {
-  allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
-  maxSize: 10 * 1024 * 1024 // 10 MB (use null for unlimited)
-});
-```
-
-Important: The `fileRestrictions` must be declared before the the directive is instantiated.
-
-### Server side
-
-On the server we declare a directive that controls upload access rules:
-
-```JavaScript
-Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
-  bucket: "mybucket",
-
-  acl: "public-read",
-
-  authorize: function () {
-    //Deny uploads if user is not logged in.
-    if (!this.userId) {
-      var message = "Please login before posting files";
-      throw new Meteor.Error("Login Required", message);
-    }
-
-    return true;
-  },
-
-  key: function (file) {
-    //Store file into a directory by the user's username.
-    var user = Meteor.users.findOne(this.userId);
-    return user.username + "/" + file.name;
-  }
-});
-```
-
-With the directive above, no other files than images will be allowed. The
-policy is directed by the meteor app server and enforced by AWS S3.
 
 ## Storage services
 
@@ -204,81 +161,6 @@ if (error) {
 The validate method will return `null` if valid and returns an `Error` instance
 if validation fails.
 
-
-### AWS S3
-
-You will need a`AWSAccessKeyId` and `AWSSecretAccessKey` in `Meteor.settings`
-and a bucket with the following CORS configuration:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-    <CORSRule>
-        <AllowedOrigin>*</AllowedOrigin>
-        <AllowedMethod>PUT</AllowedMethod>
-        <AllowedMethod>POST</AllowedMethod>
-        <AllowedMethod>GET</AllowedMethod>
-        <AllowedMethod>HEAD</AllowedMethod>
-        <MaxAgeSeconds>3000</MaxAgeSeconds>
-        <AllowedHeader>*</AllowedHeader>
-    </CORSRule>
-</CORSConfiguration>
-```
-
-Declare AWS S3 Directives as follows:
-
-```JavaScript
-Slingshot.createDirective("aws-s3-example", Slingshot.S3Storage, {
-  //...
-});
-```
-
-#### S3 with temporary AWS Credentials (Advanced)
-
-For extra security you can use
-[temporary credentials](http://docs.aws.amazon.com/STS/latest/UsingSTS/CreatingSessionTokens.html) to sign upload requests.
-
-```JavaScript
-var sts = new AWS.STS(); // Using the AWS SDK to retrieve temporary credentials
-
-Slingshot.createDirective('myUploads', Slingshot.S3Storage.TempCredentials, {
-  bucket: 'myBucket',
-  temporaryCredentials: Meteor.wrapAsync(function (expire, callback) {
-    //AWS dictates that the minimum duration must be 900 seconds:
-    var duration = Math.max(Math.round(expire / 1000), 900);
-
-    sts.getSessionToken({
-        DurationSeconds: duration
-    }, function (error, result) {
-      callback(error, result && result.Credentials);
-    });
-  })
-});
-```
-
-If you are running slingshot on an EC2 instance, you can conveniantly retreive
-your access keys with [`AWS.EC2MetadataCredentials`](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/EC2MetadataCredentials.html):
-
-```JavaScript
-var credentials = new AWS.EC2MetadataCredentials();
-
-var updateCredentials = Meteor.wrapAsync(credentials.get, credentials);
-
-Slingshot.createDirective('myUploads', Slingshot.S3Storage.TempCredentials, {
-  bucket: 'myBucket',
-  temporaryCredentials: function () {
-    if (credentials.needsRefresh()) {
-      updateCredentials();
-    }
-
-    return {
-      AccessKeyId: credentials.accessKeyId,
-      SecretAccessKey: credentials.secretAccessKey,
-      SessionToken: credentials.sessionToken
-    };
-  }
-});
-```
 
 ### Google Cloud
 
@@ -506,25 +388,6 @@ i.e. `"https://d111111abcdef8.cloudfront.net"`
 
 `expire` Number (optional) - Number of milliseconds in which an upload
 authorization will expire after the request was made. Default is 5 minutes.
-
-#### AWS S3 (`Slingshot.S3Storage`)
-
-`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
-"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
-
-`AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
-
-`AWSSecretAccessKey` String (**required**) - Can also be set in `Meteor.settings`.
-
-#### AWS S3 with Temporary Credentials (`Slingshot.S3Storage.TempCredentials`)
-
-`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
-"us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
-
-`temporaryCredentials` Function (**required**) - Function that generates temporary
-credentials. It takes a signle argument, which is the minumum desired expiration
-time in milli-seconds and it returns an object that contains `AccessKeyId`,
-`SecretAccessKey` and `SessionToken`.
 
 #### Google Cloud Storage (`Slingshot.GoogleCloud`)
 
