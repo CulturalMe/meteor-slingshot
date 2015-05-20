@@ -70,10 +70,10 @@ if (Meteor.isServer) {
 }
 ```
 
-## Container Configuration
+## Configuration
 
 You will need a`RackspaceAccountId` (your account number) and
-`RackspaceMetaDataKey` in `Meteor.settings`.
+`RackspaceMetaDataKey`.
 
 In order to obtain your `RackspaceMetaDataKey` (a.k.a. Account-Meta-Temp-Url-Key)
 you need an
@@ -95,6 +95,43 @@ curl -I -X POST -H 'X-Auth-Token: yourAuthToken' \
   -H 'X-Container-Meta-Access-Control-Allow-Origin: *' \
   -H 'X-Container-Meta-Access-Expose-Headers: etag location x-timestamp x-trans-id Access-Control-Allow-Origin' \
   https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
+```
+
+### [Meteor.settings](http://docs.meteor.com/#/full/meteor_settings)
+
+```json
+{
+  "RackspaceAccountId": "enter your account id here",
+  "RackspaceMetaDataKey": "enter meta-data key here"
+}
+```
+
+### Code
+
+```JavaScript
+
+//Set default, globally for all directives:
+
+Slingshot.RackspaceFiles.directiveDefault.RackspaceAccountId = "enter your account id here";
+Slingshot.RackspaceFiles.directiveDefault.RackspaceMetaDataKey = "enter your meta-data key here";
+
+//Or set it for a single directive:
+
+Slingshot.createDirective("myFileUploads", Slingshot.RackspaceFiles, {
+
+  RackspaceAccountId: "enter your account id here",
+  RackspaceMetaDataKey: "enter meta-data key here"
+
+  container: "myContainer",
+  region: "lon3",
+
+  cdn: "https://abcdefghije8c9d17810-ef6d926c15e2b87b22e15225c32e2e17.r19.cf5.rackcdn.com",
+
+  pathPrefix: function (file) {
+    ...
+  }
+});
+
 ```
 
 ## API Reference

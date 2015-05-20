@@ -8,33 +8,25 @@ Direct and secure file-uploads to AWS S3, Google Cloud Storage and others.
 
 ## Install
 
-For AWS S3 ([docs](services/edgee:slingshot-s3/README.md)):
+For AWS S3 ([docs](services/edgee:slingshot-s3)):
 
 ```bash
 meteor add edgee:slingshot-s3
 ```
 
-For Google Cloud Storage:
+For Google Cloud Storage ([docs](services/edgee:slingshot-google-cloud)):
 
 ```bash
 meteor add edgee:slingshot-google-cloud
 ```
 
-For Rackspace Cloud Files:
+For Rackspace Cloud Files ([docs](services/edgee:slingshot-rackspace)):
 
 ```bash
 meteor add edgee:slingshot-rackspace
 ```
 
 <!-- Add your slingshot package here -->
-
-## Update to Version 0.8.0
-
-Cloud-specific libraries have been moved into dedicated pacakges.
-
-You will need to add to respective package that you are using.
-
-(i.e. For AWS S3 use `edgee:slingshot-s3`)
 
 ## Why?
 
@@ -52,6 +44,14 @@ entire public.
 
 File uploads can not only be restricted by file-size and file-type, but also by
 other stateful criteria such as the current meteor user.
+
+## Update to Version 0.8.0
+
+Cloud-specific libraries have been moved into dedicated pacakges.
+
+You will need to add to respective package that you are using.
+
+(i.e. For AWS S3 use `edgee:slingshot-s3`)
 
 ## Storage services
 

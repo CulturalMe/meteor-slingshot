@@ -3,14 +3,14 @@ Meteor edgee:slingshot-google-cloud
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CulturalMe/meteor-slingshot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Direct and secure file-uploads to Rackspace Cloud Files using
+Direct and secure file-uploads to Google Cloud Storage using
 [edgee:slingshot](https://github.com/CulturalMe/meteor-slingshot).
 
 
 ## Install
 
 ```bash
-meteor add edgee:slingshot-rackspace
+meteor add edgee:slingshot-google-cloud
 ```
 
 ## Features
@@ -82,7 +82,7 @@ if (Meteor.isServer) {
 }
 ```
 
-## Instructions for Authorization and Bucket Configuration
+## Configuration
 
 [Generate a private key](http://goo.gl/kxt5qz) and convert it to a `.pem` file
 using openssl:
@@ -91,18 +91,58 @@ using openssl:
 openssl pkcs12 -in google-cloud-service-key.p12 -nodes -nocerts > google-cloud-service-key.pem
 ```
 
-Setup CORS on the bucket:
+Save this file into the `/private` directory of your meteor app.
+
+### [Meteor.settings](http://docs.meteor.com/#/full/meteor_settings)
+
+```json
+{
+  "GoogleAccessId": "Enter your access id (it looks like an email address)",
+
+  "GoogleSecretKey":  "Paste the contents of the private/google-cloud-service-key.pem here"
+}
+```
+
+### Code
+
+
+```JavaScript
+//Set default, globally for all directives:
+
+Slingshot.GoogleCloud.directiveDefault.GoogleAccessId = "Enter your access id (it looks like an email address)";
+Slingshot.GoogleCloud.directiveDefault.GoogleSecretKey = Assets.getText('google-cloud-service-key.pem');
+
+//Or set it for a single directive:
+
+Slingshot.createDirective("myFileUploads", Slingshot.GoogleCloud, {
+
+  GoogleAccessId: "Enter your access id (it looks like an email address)",
+
+  GoogleSecretKey: Assets.getText('google-cloud-service-key.pem'),
+
+  bucket: "mybucket",
+
+  // Uploaded files are publicly readable:
+  acl: "public-read",
+
+  authorize: function () {
+    ...
+  },
+
+  // Store files into a directory by the current users username:
+
+  key: function (file) {
+    ...
+  }
+});
+
+```
+
+## Setup CORS
 
 ```
 wget https://raw.githubusercontent.com/CulturalMe/meteor-slingshot/master/docs/gs-cors.json
 gsutil cors set gs-cors.json gs://mybucket
-```
-
-Save this file into the `/private` directory of your meteor app and add this
-line to your server-side code:
-
-```JavaScript
-Slingshot.GoogleCloud.directiveDefault.GoogleSecretKey = Assets.getText('google-cloud-service-key.pem');
 ```
 
 ## API Reference
@@ -114,10 +154,6 @@ In addition to all [standard edgee:slingshot parameters](https://github.com/Cult
 
 `bucket` String (**required**) - Name of bucket to use. The default is
 `Meteor.settings.GoogleCloudBucket`.
-
-`GoogleAccessId` String (**required**) - Can also be set in `Meteor.settings`.
-
-`GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
 
 `bucketUrl` String or Function (optional) - Override URL to which files are
  uploaded. If it is a function, then the first argument is the bucket name. This

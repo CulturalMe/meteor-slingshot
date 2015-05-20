@@ -83,10 +83,49 @@ if (Meteor.isServer) {
 }
 ```
 
-## Bucket Configuration
+## Configuration
 
-You will need a`AWSAccessKeyId` and `AWSSecretAccessKey` in `Meteor.settings`
-and a bucket with the following CORS configuration:
+### [Meteor.settings](http://docs.meteor.com/#/full/meteor_settings)
+
+```json
+{
+  "AWSAccessKeyId": "enter your key id here",
+  "AWSSecretAccessKey": "enter your secret access key here"
+}
+```
+
+### Code
+
+```JavaScript
+//Set default, globally for all directives:
+
+Slingshot.S3Storage.directiveDefault.AWSAccessKeyId = "enter your key id here";
+Slingshot.S3Storage.directiveDefault.AWSSecretAccessKey = "enter your secret access key here";
+
+//Or set it for a single directive:
+
+Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
+
+  AWSAccessKeyId: "enter your key id here",
+  AWSSecretAccessKey: "enter your secret access key here",
+
+  bucket: "mybucket",
+
+  authorize: function () {
+    ...
+  },
+
+  key: function (file) {
+    ...
+  }
+});
+
+```
+
+### CORS Setup
+
+For uploads to work, your bucket will need the following CORS
+configuration ([instructions](http://docs.aws.amazon.com/AmazonS3/latest/UG/EditingBucketPermissions.html)):
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -103,15 +142,34 @@ and a bucket with the following CORS configuration:
 </CORSConfiguration>
 ```
 
-Declare AWS S3 Directives as follows:
+### Bucket Permissions
 
-```JavaScript
-Slingshot.createDirective("aws-s3-example", Slingshot.S3Storage, {
-  //...
-});
+The following bucket permissions are required:
+
+ * `s3:PutObject`
+
+You could use this policy, but you may want to create one that is more permissive:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "statement1",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::Account-ID:user/Dave"
+            },
+            "Action": ["s3:PutObject"],
+            "Resource": "arn:aws:s3:::examplebucket"
+    ]
+}
 ```
 
 ## Advanced use with temporary credentials
+
+(These examples will require you to have the AWS SDK on the server, which
+this package itself does not depend on)
 
 For extra security you can use
 [temporary credentials](http://docs.aws.amazon.com/STS/latest/UsingSTS/CreatingSessionTokens.html) to sign upload requests.
