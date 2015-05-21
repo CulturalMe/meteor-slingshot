@@ -1,4 +1,4 @@
-Slingshot.RackspaceFiles = {
+var RackspaceFiles = {
 
   directiveMatch: {
     RackspaceAccountId: String,
@@ -111,3 +111,11 @@ Slingshot.RackspaceFiles = {
   }
 
 };
+
+
+Object.defineProperty(Slingshot, "RackspaceFiles", {
+  value: RackspaceFiles,
+  writable: true,
+  configurable: true,
+  enumerable: true
+});

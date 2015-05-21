@@ -1,6 +1,6 @@
 //GoogleCloud is based on the very same api as AWS S3, so we extend it:
 
-Slingshot.GoogleCloud = _.defaults({
+var GoogleCloud = _.defaults({
 
   accessId: "GoogleAccessId",
   secretKey: "GoogleSecretKey",
@@ -56,3 +56,10 @@ Slingshot.GoogleCloud = _.defaults({
       .sign(secretKey, "base64");
   }
 }, Slingshot.S3Storage);
+
+Object.defineProperty(Slingshot, "GoogleCloud", {
+  value: GoogleCloud,
+  writable: true,
+  configurable: true,
+  enumerable: true
+});
