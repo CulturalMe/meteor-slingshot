@@ -39,7 +39,7 @@ var uploader = new Slingshot.Upload("myFileUploads");
 
 uploader.send(document.getElementById('input').files[0], function (error, downloadUrl) {
   if (error) {
-    // Log service detailed response
+    // Log service detailed response.
     console.error('Error uploading', uploader.xhr.response);
     alert (error);
   }
@@ -57,7 +57,7 @@ the directive on the server side to enforce them:
 ```JavaScript
 Slingshot.fileRestrictions("myFileUploads", {
   allowedFileTypes: ["image/png", "image/jpeg", "image/gif"],
-  maxSize: 10 * 1024 * 1024 // 10 MB (use null for unlimited)
+  maxSize: 10 * 1024 * 1024 // 10 MB (use null for unlimited).
 });
 ```
 
@@ -140,8 +140,8 @@ Template.progressBar.helpers({
 ```JavaScript
 Template.myPicture.helpers({
   url: function () {
-    //if we are uploading an image, pass true to download the image into cache
-    //this will preload the image before using the remote image url.
+    //If we are uploading an image, pass true to download the image into cache.
+    //This will preload the image before using the remote image url.
     return this.uploader.url(true);
   }
 });
@@ -239,7 +239,7 @@ For extra security you can use
 [temporary credentials](http://docs.aws.amazon.com/STS/latest/UsingSTS/CreatingSessionTokens.html) to sign upload requests.
 
 ```JavaScript
-var sts = new AWS.STS(); // Using the AWS SDK to retrieve temporary credentials
+var sts = new AWS.STS(); // Using the AWS SDK to retrieve temporary credentials.
 
 Slingshot.createDirective('myUploads', Slingshot.S3Storage.TempCredentials, {
   bucket: 'myBucket',
@@ -329,8 +329,8 @@ For your directive you need container and provide its name, region and cdn.
 
 ```JavaScript
 Slingshot.createDirective("rackspace-files-example", Slingshot.RackspaceFiles, {
-  container: "myContainer", //Container name
-  region: "lon3", //Region code (The default would be 'iad3')
+  container: "myContainer", //Container name.
+  region: "lon3", //Region code (The default would be 'iad3').
 
   //You must set the cdn if you want the files to be publicly accessible:
   cdn: "https://abcdefghije8c9d17810-ef6d926c15e2b87b22e15225c32e2e17.r19.cf5.rackcdn.com",
@@ -398,7 +398,7 @@ MyStorageService = {
   },
 
   /**
-   * Here you can set default parameters that your service will use
+   * Here you can set default parameters that your service will use.
    */
 
   directiveDefault: {
@@ -411,7 +411,7 @@ MyStorageService = {
    * @param {Object} method - This is the Meteor Method context.
    * @param {Object} directive - All the parameters from the directive.
    * @param {Object} file - Information about the file as gathered by the
-   * browser
+   * browser.
    * @param {Object} [meta] - Meta data that was passed to the uploader.
    *
    * @returns {UploadInstructions}
