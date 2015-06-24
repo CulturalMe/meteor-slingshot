@@ -39,7 +39,7 @@ Slingshot.S3Storage = {
     }),
 
     cacheControl: Match.Optional(String),
-    contentDisposition: Match.Optional(Match.OneOf(String, null))
+    contentDisposition: Match.Optional(Match.OneOf(String, Function, null))
   },
 
   directiveDefault: _.chain(Meteor.settings)
@@ -61,6 +61,22 @@ Slingshot.S3Storage = {
     })
     .value(),
 
+  getContentDisposition: function (method, directive, file, meta) {
+    var getContentDisposition = directive.contentDisposition;
+
+    if (!_.isFunction(getContentDisposition)) {
+      getContentDisposition = function () {
+        var filename = file.name && encodeURIComponent(file.name);
+
+        return directive.contentDisposition || filename &&
+          "inline; filename=\"" + filename + "\"; filename*=utf-8''" +
+          filename;
+      };
+    }
+
+    return getContentDisposition.call(method, file, meta);
+  },
+
   /**
    *
    * @param {{userId: String}} method
@@ -72,9 +88,7 @@ Slingshot.S3Storage = {
    */
 
   upload: function (method, directive, file, meta) {
-    var url = Npm.require("url"),
-
-        policy = new Slingshot.StoragePolicy()
+    var policy = new Slingshot.StoragePolicy()
           .expireIn(directive.expire)
           .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
 
@@ -88,8 +102,8 @@ Slingshot.S3Storage = {
           "acl": directive.acl,
 
           "Cache-Control": directive.cacheControl,
-          "Content-Disposition": directive.contentDisposition || file.name &&
-            "inline; filename=" + quoteString(file.name, '"')
+          "Content-Disposition": this.getContentDisposition(method, directive,
+            file, meta)
         },
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
@@ -170,9 +184,37 @@ Slingshot.S3Storage = {
   }
 };
 
-function quoteString(string, quotes) {
-  return quotes + string.replace(quotes, '\\' + quotes) + quotes;
-}
+Slingshot.S3Storage.TempCredentials = _.defaults({
+
+  directiveMatch: _.chain(Slingshot.S3Storage.directiveMatch)
+    .omit("AWSAccessKeyId", "AWSSecretAccessKey")
+    .extend({
+      temporaryCredentials: Function
+    })
+    .value(),
+
+  directiveDefault: _.omit(Slingshot.S3Storage.directiveDefault,
+    "AWSAccessKeyId", "AWSSecretAccessKey"),
+
+  applySignature: function (payload, policy, directive) {
+    var credentials = directive.temporaryCredentials(directive.expire);
+
+    check(credentials, Match.ObjectIncluding({
+      AccessKeyId: Slingshot.S3Storage.directiveMatch.AWSAccessKeyId,
+      SecretAccessKey: Slingshot.S3Storage.directiveMatch.AWSSecretAccessKey,
+      SessionToken: String
+    }));
+
+    payload["x-amz-security-token"] = credentials.SessionToken;
+
+    return Slingshot.S3Storage.applySignature
+      .call(this, payload, policy, _.defaults({
+        AWSAccessKeyId: credentials.AccessKeyId,
+        AWSSecretAccessKey: credentials.SecretAccessKey
+      }, directive));
+  }
+}, Slingshot.S3Storage);
+
 
 function formatNumber(num, digits) {
   var string = String(num);

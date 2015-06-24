@@ -1,5 +1,22 @@
 Slingshot Changelog
 ===================
+
+## Version 0.7.1
+
+### Enhancements
+
+ * Added support for dynamic content-disposition for S3 and Google Cloud ([#64](https://github.com/CulturalMe/meteor-slingshot/issues/64))
+
+## Version 0.7.0
+
+### Enhancements
+
+ * Added `Slingshot.S3Storage.TempCredentials` ([#95](https://github.com/CulturalMe/meteor-slingshot/issues/95)). Thanks @jossoco
+
+### Bug Fixes
+
+ * Fixed character encoding for content-disposition for AWS-S3 based directives. Thanks @timtch.
+
 ## Version 0.6.2
 
 Removed debugging log.
