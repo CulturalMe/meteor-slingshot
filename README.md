@@ -73,6 +73,9 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 
   acl: "public-read",
 
+  // 'STANDARD' or 'REDUCED_REDUNDANCY'
+  storageClass: 'REDUCED_REDUNDANCY', 
+
   authorize: function () {
     //Deny uploads if user is not logged in.
     if (!this.userId) {

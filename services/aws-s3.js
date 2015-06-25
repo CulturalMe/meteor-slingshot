@@ -15,6 +15,9 @@ Slingshot.S3Storage = {
 
     AWSAccessKeyId: String,
     AWSSecretAccessKey: String,
+    
+    // STANDARD or REDUCED_REDUNDANCY
+    storageClass: Match.Optional(String),
 
     acl: Match.Optional(Match.Where(function (acl) {
       check(acl, String);
@@ -116,6 +119,13 @@ Slingshot.S3Storage = {
         ].map(function (part) {
             return part.replace(/\/+$/, '');
           }).join("/");
+
+    // The type of storage to use for the object. Defaults to 'STANDARD'. 
+    // Possible values include:
+    // "STANDARD"
+    // "REDUCED_REDUNDANCY"
+    var storeClass = directive.storageClass || "STANDARD";
+    payload["x-amz-storage-class"] = storeClass;
 
     this.applySignature(payload, policy, directive);
 
