@@ -94,6 +94,8 @@ Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
 With the directive above, no other files than images will be allowed. The
 policy is directed by the meteor app server and enforced by AWS S3.
 
+Note: If your bucket is created in any region other than `US Standard`, you will need to set the `region` key in the directive. Refer the [AWS Slingshot Storage Directives](#aws-s3-slingshots3storage)
+
 ## Storage services
 
 The client side is agnostic to which storage service is used. All it

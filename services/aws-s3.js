@@ -50,6 +50,8 @@ Slingshot.S3Storage = {
         var bucketDomain = "s3-" + region + ".amazonaws.com";
         if (region === "us-east-1")
           bucketDomain = "s3.amazonaws.com";
+        if (region === "cn-north-1")
+          bucketDomain = "s3.cn-north-1.amazonaws.com.cn";
 
         if (bucket.indexOf(".") !== -1)
           return "https://" + bucketDomain + "/" + bucket;
