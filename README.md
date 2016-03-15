@@ -282,6 +282,22 @@ Slingshot.createDirective('myUploads', Slingshot.S3Storage.TempCredentials, {
 });
 ```
 
+#### S3 Server-Side Encryption (SSE)
+
+You can enable server-side encryption by setting the "sse" key in the metaContext accordingly.
+
+```JavaScript
+var uploadToMyAlbum = new Slingshot.Upload("picturealbum", {
+  sse: true
+});
+```
+The "sse" key can take one of the following values:
+```JavaScript
+true //enables AWS-managed AES-256 encryption keys
+{kms: true, kmsKeyId: YOUR_KMS_KEY_ID} //enables AWS-managed KMS encryption keys. If the kmsKeyId is not specified, the master key will be used
+{key: YOUR_AES256_KEY} //enables SSE with customer-provided keys
+```
+
 ### Google Cloud
 
 [Generate a private key](http://goo.gl/kxt5qz) and convert it to a `.pem` file
