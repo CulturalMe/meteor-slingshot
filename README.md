@@ -354,6 +354,12 @@ curl -I -X POST -H 'X-Auth-Token: yourAuthToken' \
   https://storage101.containerRegion.clouddrive.com/v1/MossoCloudFS_yourAccoountNumber/yourContainer
 ```
 
+
+### Cloudinary
+
+Cloudinary is supported via a 3rd party package.  
+[jimmiebtlr:cloudinary](https://atmospherejs.com/jimmiebtlr/slingshot-cloudinary)
+
 ## Browser Compatibility
 
 Currently the uploader uses `XMLHttpRequest 2` to upload the files, which is not
