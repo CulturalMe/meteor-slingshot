@@ -4,13 +4,14 @@ Slingshot.S3Storage = {
   secretKey: "AWSSecretAccessKey",
 
   directiveMatch: {
-    bucket: String,
+    bucket: Match.OneOf(String, Function),
     bucketUrl: Match.OneOf(String, Function),
 
     region: Match.Where(function (region) {
-      check(region, String);
-
-      return /^[a-z]{2}-\w+-\d+$/.test(region);
+      return (
+        Match.test(region, String)
+        && /^[a-z]{2}-\w+-\d+$/.test(region)
+      ) || Match.test(region, Function);
     }),
 
     AWSAccessKeyId: String,
@@ -90,7 +91,13 @@ Slingshot.S3Storage = {
    */
 
   upload: function (method, directive, file, meta) {
-    var policy = new Slingshot.StoragePolicy()
+    var bucket = _.isFunction(directive.bucket) ?
+          directive.bucket.call(method, file, meta) : directive.bucket,
+
+        region = _.isFunction(directive.region) ?
+          directive.region.call(method, file, meta) : directive.region,
+
+        policy = new Slingshot.StoragePolicy()
           .expireIn(directive.expire)
           .contentLength(0, Math.min(file.size, directive.maxSize || Infinity)),
 
@@ -98,7 +105,7 @@ Slingshot.S3Storage = {
           key: _.isFunction(directive.key) ?
             directive.key.call(method, file, meta) : directive.key,
 
-          bucket: directive.bucket,
+          bucket: bucket,
 
           "Content-Type": file.type,
           "acl": directive.acl,
@@ -109,7 +116,7 @@ Slingshot.S3Storage = {
         },
 
         bucketUrl = _.isFunction(directive.bucketUrl) ?
-          directive.bucketUrl(directive.bucket, directive.region) :
+          directive.bucketUrl(bucket, region) :
           directive.bucketUrl,
 
         downloadUrl = [
@@ -118,8 +125,7 @@ Slingshot.S3Storage = {
         ].map(function (part) {
             return part.replace(/\/+$/, '');
           }).join("/");
-
-    this.applySignature(payload, policy, directive);
+    this.applySignature(region, payload, policy, directive);
 
     return {
       upload: bucketUrl,
@@ -143,8 +149,9 @@ Slingshot.S3Storage = {
    * @param {Directive} directive
    */
 
-  applySignature: function (payload, policy, directive) {
+  applySignature: function (region, payload, policy, directive) {
     var now =  new Date(),
+
         today = now.getUTCFullYear() + formatNumber(now.getUTCMonth() + 1, 2) +
           formatNumber(now.getUTCDate(), 2),
         service = "s3";
@@ -154,7 +161,7 @@ Slingshot.S3Storage = {
       "x-amz-credential": [
         directive[this.accessId],
         today,
-        directive.region,
+        region,
         service,
         "aws4_request"
       ].join("/"),
@@ -163,7 +170,7 @@ Slingshot.S3Storage = {
 
     payload.policy = policy.match(payload).stringify();
     payload["x-amz-signature"] = this.signAwsV4(payload.policy,
-      directive[this.secretKey], today, directive.region, service);
+      directive[this.secretKey], today, region, service);
   },
 
   /** Generate a AWS Signature Version 4
@@ -198,7 +205,7 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
   directiveDefault: _.omit(Slingshot.S3Storage.directiveDefault,
     "AWSAccessKeyId", "AWSSecretAccessKey"),
 
-  applySignature: function (payload, policy, directive) {
+  applySignature: function (region, payload, policy, directive) {
     var credentials = directive.temporaryCredentials(directive.expire);
 
     check(credentials, Match.ObjectIncluding({
@@ -210,7 +217,7 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
     payload["x-amz-security-token"] = credentials.SessionToken;
 
     return Slingshot.S3Storage.applySignature
-      .call(this, payload, policy, _.defaults({
+      .call(this, region, payload, policy, _.defaults({
         AWSAccessKeyId: credentials.AccessKeyId,
         AWSSecretAccessKey: credentials.SecretAccessKey
       }, directive));
