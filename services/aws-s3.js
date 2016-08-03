@@ -125,7 +125,7 @@ Slingshot.S3Storage = {
         ].map(function (part) {
             return part.replace(/\/+$/, '');
           }).join("/");
-    this.applySignature(method, payload, policy, directive, file, meta);
+    this.applySignature(region, payload, policy, directive);
 
     return {
       upload: bucketUrl,
