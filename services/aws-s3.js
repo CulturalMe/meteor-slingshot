@@ -149,11 +149,8 @@ Slingshot.S3Storage = {
    * @param {Directive} directive
    */
 
-  applySignature: function (method, payload, policy, directive, file, meta) {
+  applySignature: function (region, payload, policy, directive) {
     var now =  new Date(),
-
-        region = _.isFunction(directive.region) ?
-          directive.region.call(method, file, meta) : directive.region,
 
         today = now.getUTCFullYear() + formatNumber(now.getUTCMonth() + 1, 2) +
           formatNumber(now.getUTCDate(), 2),
@@ -208,7 +205,7 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
   directiveDefault: _.omit(Slingshot.S3Storage.directiveDefault,
     "AWSAccessKeyId", "AWSSecretAccessKey"),
 
-  applySignature: function (method, payload, policy, directive, file, meta) {
+  applySignature: function (region, payload, policy, directive) {
     var credentials = directive.temporaryCredentials(directive.expire);
 
     check(credentials, Match.ObjectIncluding({
@@ -220,10 +217,10 @@ Slingshot.S3Storage.TempCredentials = _.defaults({
     payload["x-amz-security-token"] = credentials.SessionToken;
 
     return Slingshot.S3Storage.applySignature
-      .call(this, method, payload, policy, _.defaults({
+      .call(this, region, payload, policy, _.defaults({
         AWSAccessKeyId: credentials.AccessKeyId,
         AWSSecretAccessKey: credentials.SecretAccessKey
-      }, directive), file, meta);
+      }, directive));
   }
 }, Slingshot.S3Storage);
 
