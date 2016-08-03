@@ -69,7 +69,7 @@ On the server we declare a directive that controls upload access rules:
 
 ```JavaScript
 Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
-  bucket: "mybucket",
+  bucket: "mybucket", // This may be a String or a function
 
   acl: "public-read",
 
@@ -517,8 +517,17 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 #### AWS S3 (`Slingshot.S3Storage`)
 
-`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
+`bucket` String or Function (**required**) - Name of bucket to use. For AWS S3
+the default bucket is `Meteor.settings.S3Bucket`.
+If a function is provided, it will be called with `userId` in the context and
+its return value is used as the bucket. First argument is file info and the
+second is the meta-information that can be passed by the client.
+
+`region` String or Function(optional) - Default is `Meteor.settings.AWSRegion` or
 "us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
+If a function is provided, it will be called with `userId` in the context and
+its return value is used as the region. First argument is file info and the
+second is the meta-information that can be passed by the client.
 
 `AWSAccessKeyId` String (**required**) - Can also be set in `Meteor.settings`.
 
@@ -526,8 +535,17 @@ authorization will expire after the request was made. Default is 5 minutes.
 
 #### AWS S3 with Temporary Credentials (`Slingshot.S3Storage.TempCredentials`)
 
-`region` String (optional) - Default is `Meteor.settings.AWSRegion` or
+`bucket` String or Function (**required**) - Name of bucket to use. For AWS S3
+the default bucket is `Meteor.settings.S3Bucket`.
+If a function is provided, it will be called with `userId` in the context and
+its return value is used as the bucket. First argument is file info and the
+second is the meta-information that can be passed by the client.
+
+`region` String or Function(optional) - Default is `Meteor.settings.AWSRegion` or
 "us-east-1". [See AWS Regions](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
+If a function is provided, it will be called with `userId` in the context and
+its return value is used as the region. First argument is file info and the
+second is the meta-information that can be passed by the client.
 
 `temporaryCredentials` Function (**required**) - Function that generates temporary
 credentials. It takes a signle argument, which is the minumum desired expiration
@@ -544,10 +562,6 @@ time in milli-seconds and it returns an object that contains `AccessKeyId`,
 `GoogleSecretKey` String (**required**) - Can also be set in `Meteor.settings`.
 
 #### AWS S3 and Google Cloud Storage
-
-`bucket` String (**required**) - Name of bucket to use. The default is
-`Meteor.settings.GoogleCloudBucket`. For AWS S3 the default bucket is
-`Meteor.settings.S3Bucket`.
 
 `bucketUrl` String or Function (optional) - Override URL to which files are
  uploaded. If it is a function, then the first argument is the bucket name. This
