@@ -61,7 +61,7 @@ Slingshot.fileRestrictions("myFileUploads", {
 });
 ```
 
-Important: The `fileRestrictions` must be declared before the the directive is instantiated.
+Important: The `fileRestrictions` must be declared before the directive is instantiated.
 
 ### Server side
 
@@ -357,7 +357,7 @@ curl -I -X POST -H 'X-Auth-Token: yourAuthToken' \
 
 ### Cloudinary
 
-Cloudinary is supported via a 3rd party package.  
+Cloudinary is supported via a 3rd party package.
 [jimmiebtlr:cloudinary](https://atmospherejs.com/jimmiebtlr/slingshot-cloudinary)
 
 ## Browser Compatibility
