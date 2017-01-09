@@ -8,7 +8,7 @@ Package.describe({
 Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
 
-  api.use(["underscore", "check"]);
+  api.use(["underscore", "check", 'jparker:crypto-sha1']);
   api.use(["tracker", "reactive-var"], "client");
 
   api.add_files([
@@ -23,7 +23,8 @@ Package.on_use(function (api) {
     "lib/storage-policy.js",
     "services/aws-s3.js",
     "services/google-cloud.js",
-    "services/rackspace.js"
+    "services/rackspace.js",
+    "services/cloudinary.js"
   ], "server");
 
   api.export("Slingshot");
@@ -32,4 +33,5 @@ Package.on_use(function (api) {
 Package.on_test(function (api) {
   api.use(["tinytest", "underscore", "edgee:slingshot"]);
   api.add_files("test/aws-s3.js", "server");
+  api.add_files("test/cloudinary.js", "server");
 });
