@@ -390,7 +390,7 @@ with the following parameters:
 MyStorageService = {
 
   /**
-   * Define the additional parameters that your your service uses here.
+   * Define the additional parameters that your service uses here.
    *
    * Note that some parameters like maxSize are shared by all services. You do
    * not need to define those by yourself.
