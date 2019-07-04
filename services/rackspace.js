@@ -1,3 +1,5 @@
+import { _ } from 'meteor/underscore';
+
 Slingshot.RackspaceFiles = {
 
   directiveMatch: {

@@ -1,3 +1,5 @@
+import { _ } from 'meteor/underscore';
+
 //GoogleCloud is based on the very same api as AWS S3, so we extend it:
 
 Slingshot.GoogleCloud = _.defaults({
