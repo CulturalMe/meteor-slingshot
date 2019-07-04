@@ -8,7 +8,8 @@ Package.describe({
 Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
 
-  api.use(["underscore", "check"]);
+  api.use(["check", "ecmascript"]);
+  api.use(["underscore"], "server");
   api.use(["tracker", "reactive-var"], "client");
 
   api.add_files([
