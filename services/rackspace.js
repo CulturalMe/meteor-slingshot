@@ -106,7 +106,7 @@ Slingshot.RackspaceFiles = {
 
     return Npm.require("crypto")
       .createHmac("sha1", secretkey)
-      .update(new Buffer(policy, "utf-8"))
+      .update(Buffer.from(policy, "utf-8"))
       .digest("hex");
   }
 
