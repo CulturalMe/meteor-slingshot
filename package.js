@@ -5,20 +5,20 @@ Package.describe({
   git: "https://github.com/CulturalMe/meteor-slingshot"
 });
 
-Package.on_use(function (api) {
+Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.0');
 
   api.use(["underscore", "check"]);
   api.use(["tracker", "reactive-var"], "client");
 
-  api.add_files([
+  api.addFiles([
     "lib/restrictions.js",
     "lib/validators.js"
   ]);
 
-  api.add_files("lib/upload.js", "client");
+  api.addFiles("lib/upload.js", "client");
 
-  api.add_files([
+  api.addFiles([
     "lib/directive.js",
     "lib/storage-policy.js",
     "services/aws-s3.js",
@@ -29,7 +29,7 @@ Package.on_use(function (api) {
   api.export("Slingshot");
 });
 
-Package.on_test(function (api) {
+Package.onTest(function (api) {
   api.use(["tinytest", "underscore", "edgee:slingshot"]);
-  api.add_files("test/aws-s3.js", "server");
+  api.addFiles("test/aws-s3.js", "server");
 });
