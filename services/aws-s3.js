@@ -230,6 +230,6 @@ function hmac256(key, data, encoding) {
   /* global Buffer: false */
   return crypto
     .createHmac("sha256", key)
-    .update(new Buffer(data, "utf-8"))
+    .update(new Buffer.from(data, "utf-8"))
     .digest(encoding);
 }
